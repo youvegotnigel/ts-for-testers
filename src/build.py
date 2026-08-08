@@ -2,8 +2,8 @@
 """
 Builds docs/index.html from src/typescript-cheatsheet.md.
 
-Run it locally with:   python src/build.py
-GitHub Actions runs the same command on every push to main.
+Run it locally with:   python3 src/build.py
+Then commit the regenerated docs/ folder; GitHub Pages serves it directly.
 """
 
 import html as htmlmod
@@ -18,7 +18,7 @@ from pygments.formatters import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
 
 # ----------------------------------------------------------------------
-# CONFIG: change these three lines to your own repo, then rebuild.
+# CONFIG: change these two lines to your own repo, then rebuild.
 # ----------------------------------------------------------------------
 GITHUB_USER = "youvegotnigel"
 REPO_NAME = "ts-for-testers"

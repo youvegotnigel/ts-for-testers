@@ -19,7 +19,7 @@ No build tooling to install, no dependencies at runtime, no tracking, no paywall
 | **Search** | Filters sections instantly, press `/` from anywhere |
 | **Progress** | Mark sections as passed and watch the run summary fill |
 | **Themes** | Dark and light, with hand tuned syntax colours for both |
-| **Offline** | One self contained HTML file, works with no network |
+| **Offline** | CSS, JavaScript and syntax highlighting are inlined into `index.html`. The only external request is the IBM Plex web font, which falls back to system fonts with no network |
 
 The page is built around a single idea: it behaves like a test run. Each section is a spec file with a status, the sidebar is runner output, and clearing all 30 prints a completion line like a real runner.
 
@@ -47,19 +47,19 @@ You do not need a paid plan. GitHub Pages is free for public repositories.
 
 That is it. The `docs/` folder is already built and committed, so nothing else needs to run.
 
-### The maintainable path, with CI
+### Keeping it up to date
 
-Once you want to edit the content rather than the HTML, switch to the included GitHub Actions workflow. It rebuilds the site from the Markdown source on every push.
+There is no CI workflow in this repository. Editing the content is a local loop:
 
-1. Do steps 1 to 3 above.
-2. Under **Build and deployment**, set **Source** to `GitHub Actions` instead of `Deploy from a branch`.
-3. Push any change under `src/`. The workflow in `.github/workflows/deploy.yml` builds and deploys automatically.
+1. Edit `src/typescript-cheatsheet.md`.
+2. Run `python3 src/build.py` to regenerate `docs/index.html`.
+3. Commit both the source and the rebuilt `docs/` and push. Pages redeploys from the branch.
 
-From then on you edit `src/typescript-cheatsheet.md` and never touch the HTML.
+If you would rather have GitHub Actions rebuild on every push, add your own workflow that installs `src/requirements.txt`, runs `python3 src/build.py`, and publishes `docs/`, then set **Source** to `GitHub Actions` under Settings then Pages.
 
 ### Point it at your own repo
 
-Open `src/build.py` and change the three lines at the top:
+Open `src/build.py` and change the two lines at the top:
 
 ```python
 GITHUB_USER = "youvegotnigel"
@@ -82,8 +82,8 @@ These drive the canonical URL, the social preview metadata, the sitemap, and the
 Then rebuild:
 
 ```bash
-pip install -r src/requirements.txt
-python src/build.py
+pip3 install -r src/requirements.txt
+python3 src/build.py
 ```
 
 The script prints the section count and output size, and fails loudly if it does not find exactly 30 sections. That guard is deliberate: a malformed heading silently dropping a section is the failure mode most likely to slip through.
@@ -91,7 +91,7 @@ The script prints the section count and output size, and fails loudly if it does
 ### Preview locally
 
 ```bash
-python -m http.server 8000 --directory docs
+python3 -m http.server 8000 --directory docs
 ```
 
 Then open http://localhost:8000.
@@ -115,7 +115,7 @@ Then open http://localhost:8000.
 │   ├── style.css               design system
 │   ├── app.js                  search, progress, copy, theme
 │   └── requirements.txt
-└── .github/workflows/deploy.yml
+└── README.md
 ```
 
 ---
