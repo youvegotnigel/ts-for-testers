@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://youvegotnigel.github.io/ts-for-testers/sitemap.xml
