@@ -4,7 +4,9 @@ A free, interactive TypeScript reference for QA engineers moving into Playwright
 
 **Read it here:** https://youvegotnigel.github.io/ts-for-testers/
 
-30 sections covering types, interfaces, classes, generics, utility types, the Page Object Model, and the TypeScript patterns that actually show up in a test framework. Every example is written the way you would write it inside a real suite.
+31 sections covering types, interfaces, classes, generics, utility types, the Page Object Model, and the TypeScript patterns that actually show up in a test framework. Every example is written the way you would write it inside a real suite.
+
+Section 22 is a visual guide to promises and flaky tests: what a promise actually is, what it does inside a variable, a function and a class, and how each mistake turns into a test that only fails in CI. It carries the diagrams and the race simulator.
 
 No build tooling to install, no dependencies at runtime, no tracking, no paywall.
 
@@ -14,8 +16,9 @@ No build tooling to install, no dependencies at runtime, no tracking, no paywall
 
 | | |
 |---|---|
-| **Sections** | 30, from "what is TypeScript" to a one page summary |
-| **Code examples** | 97, all Playwright and TypeScript flavoured |
+| **Sections** | 31, from "what is TypeScript" to a one page summary |
+| **Code examples** | 110, all Playwright and TypeScript flavoured |
+| **Diagrams** | 6 inline SVG figures, plus a race simulator that shows the same test passing and failing on different machine speeds |
 | **Search** | Filters sections instantly, press `/` from anywhere |
 | **Progress** | Mark sections as passed and watch the run summary fill |
 | **Themes** | Dark and light, with hand tuned syntax colours for both |
@@ -75,9 +78,11 @@ These drive the canonical URL, the social preview metadata, the sitemap, and the
 `src/typescript-cheatsheet.md` is the single source of truth. The rules the build script relies on:
 
 - Each section starts with `## N. Title`, numbered from 1.
-- Section numbers must line up with the `SLUGS` list in `src/build.py`. Adding a section means adding a slug.
+- Section numbers must line up with the `SLUGS` list in `src/build.py`. Adding a section means adding a slug, in the same position, and the counts in the page update themselves from that list.
 - Fenced code blocks should carry a language: `ts`, `js`, `bash`, `json`, or `jsonc`.
 - Tables use standard Markdown pipe syntax.
+- Callouts use GitHub alert syntax: a blockquote whose first line is `> [!NOTE]`, `> [!TIP]` or `> [!WARNING]`. GitHub renders these natively, and the build tints the note blue, green or red.
+- Figures and interactive blocks are dropped in with a token on its own line, for example `[widget:promise-states]`. The HTML for each one lives in `src/widgets.py`, so the Markdown stays readable. An unknown widget name fails the build.
 
 Then rebuild:
 
@@ -86,7 +91,7 @@ pip3 install -r src/requirements.txt
 python3 src/build.py
 ```
 
-The script prints the section count and output size, and fails loudly if it does not find exactly 30 sections. That guard is deliberate: a malformed heading silently dropping a section is the failure mode most likely to slip through.
+The script prints the section count and output size, and fails loudly if the number of sections does not match the `SLUGS` list. That guard is deliberate: a malformed heading silently dropping a section is the failure mode most likely to slip through.
 
 ### Preview locally
 
@@ -112,8 +117,9 @@ Then open http://localhost:8000.
 ├── src/                        source of truth
 │   ├── typescript-cheatsheet.md  the content
 │   ├── build.py                Markdown to HTML build
+│   ├── widgets.py              inline SVG figures and interactive blocks
 │   ├── style.css               design system
-│   ├── app.js                  search, progress, copy, theme
+│   ├── app.js                  search, progress, copy, theme, tabs, simulator
 │   └── requirements.txt
 └── README.md
 ```
@@ -125,6 +131,7 @@ Then open http://localhost:8000.
 - **Type** is IBM Plex Sans and IBM Plex Mono. IBM built Plex for technical documentation, and the mono face carries all the structural chrome: section numbers, spec filenames, status pills.
 - **Colour** follows CI build semantics, which QA engineers already read fluently. Amber is the accent, green means passed and nothing else, red is reserved for pitfalls. Green never decorates, so it always carries state.
 - **Syntax highlighting** is baked in at build time with Pygments rather than a runtime JavaScript library. That keeps the page dependency free and working offline.
+- **Diagrams** are hand written inline SVG that paints itself from the same CSS custom properties as the rest of the page, so there is one copy of each figure rather than a light one and a dark one. On narrow screens they scroll sideways instead of shrinking their labels past legible.
 - **Progress is session only.** A test run does not persist, and neither does this. There is a Reset run button for a fresh pass.
 
 ---

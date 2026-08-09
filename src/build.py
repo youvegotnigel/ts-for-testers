@@ -17,6 +17,8 @@ from pygments import highlight
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
 
+import widgets
+
 # ----------------------------------------------------------------------
 # CONFIG: change these two lines to your own repo, then rebuild.
 # ----------------------------------------------------------------------
@@ -32,18 +34,23 @@ OUT_DIR = os.path.join(ROOT, "docs")
 PAGE_TITLE = "TypeScript for Test Automation Engineers"
 PAGE_DESC = (
     "A free interactive TypeScript reference for QA engineers moving into "
-    "Playwright. 30 sections covering types, interfaces, classes, generics, "
-    "utility types and the Page Object Model, with runnable examples."
+    "Playwright. 31 sections covering types, interfaces, classes, generics, "
+    "utility types, the Page Object Model and a visual guide to promises "
+    "and flaky tests, with runnable examples."
 )
 
+# Section N of the Markdown maps to SLUGS[N - 1]. Adding a section means
+# adding its slug here, in the same position.
 SLUGS = [
     "what-is-typescript", "setup", "variables", "basic-types", "type-inference",
     "arrays-objects", "special-types", "functions", "interfaces", "type-aliases",
     "interface-vs-type", "unions-intersections", "narrowing", "enums", "classes-pom",
     "generics", "type-assertions", "optional-chaining", "modules", "utility-types",
-    "async-await", "modern-js", "tsconfig", "test-data-env", "playwright-patterns",
-    "compiler-errors", "best-practices", "pitfalls", "exercises", "summary",
+    "async-await", "promises-flaky-tests", "modern-js", "tsconfig", "test-data-env",
+    "playwright-patterns", "compiler-errors", "best-practices", "pitfalls",
+    "exercises", "summary",
 ]
+SECTION_COUNT = len(SLUGS)
 
 LANG_LABEL = {
     "ts": "TypeScript", "typescript": "TypeScript",
@@ -72,20 +79,37 @@ def render_code(code, lang):
     )
 
 
+# GitHub style alerts: "> [!TIP]" on the first line of a blockquote.
+# GitHub renders these natively, and here they tint the existing note style.
+ALERT_CLASS = {"NOTE": "note", "TIP": "note tip", "WARNING": "note warn"}
+
+
 def convert(body):
-    """Markdown to HTML, with fenced code pulled out and highlighted by hand."""
+    """Markdown to HTML, with fenced code and figures pulled out first."""
     blocks = []
 
-    def stash(m):
-        blocks.append(render_code(m.group(2), (m.group(1) or "").strip().lower()))
-        return "\n\nCODEBLOCKTOKEN%d\n\n" % (len(blocks) - 1)
+    def stash(html):
+        blocks.append(html)
+        return "\n\nBLOCKTOKEN%d\n\n" % (len(blocks) - 1)
 
-    body = re.sub(r"```([a-zA-Z]*)\n(.*?)```", stash, body, flags=re.S)
+    def stash_code(m):
+        return stash(render_code(m.group(2), (m.group(1) or "").strip().lower()))
+
+    def stash_widget(m):
+        return stash(widgets.render(m.group(1), render_code))
+
+    body = re.sub(r"```([a-zA-Z]*)\n(.*?)```", stash_code, body, flags=re.S)
+    body = re.sub(r"^\[widget:([a-z0-9-]+)\][ \t]*$", stash_widget, body, flags=re.M)
     out = markdown.markdown(body, extensions=["tables", "sane_lists"])
 
     for i, blk in enumerate(blocks):
-        out = out.replace("<p>CODEBLOCKTOKEN%d</p>" % i, blk)
+        out = out.replace("<p>BLOCKTOKEN%d</p>" % i, blk)
 
+    out = re.sub(
+        r"<blockquote>\s*<p>\[!(NOTE|TIP|WARNING)\]\s*",
+        lambda m: '<blockquote class="%s">\n<p>' % ALERT_CLASS[m.group(1)],
+        out,
+    )
     out = out.replace("<table>", '<div class="table-scroll"><table>')
     out = out.replace("</table>", "</table></div>")
     out = re.sub(r'<a href="(https?://[^"]+)"',
@@ -159,7 +183,7 @@ TEMPLATE = """<!DOCTYPE html>
   </div>
   <div class="run-summary">
     <span class="stat stat-pass">\u2713 <b id="passCount">0</b> passed</span>
-    <span class="stat stat-pend">\u25cb <b id="pendCount">30</b> pending</span>
+    <span class="stat stat-pend">\u25cb <b id="pendCount">__COUNT__</b> pending</span>
   </div>
   <a class="icon-btn" href="__REPO__" target="_blank" rel="noopener" aria-label="View the source on GitHub">
     <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 .2a8 8 0 0 0-2.5 15.6c.4.1.5-.2.5-.4v-1.4c-2 .4-2.5-.5-2.7-1 0-.1-.5-.9-.9-1.1-.3-.2-.7-.6 0-.6.6 0 1 .6 1.2.8.7 1.2 1.8.9 2.3.7 0-.5.3-.9.5-1.1-1.8-.2-3.7-.9-3.7-4 0-.9.3-1.6.8-2.2 0-.2-.3-1 .1-2.1 0 0 .7-.2 2.2.8a7.4 7.4 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.2 0 3.1-1.9 3.8-3.7 4 .3.3.6.8.6 1.6v2.2c0 .2.1.5.5.4A8 8 0 0 0 8 .2Z"/></svg>
@@ -178,10 +202,10 @@ TEMPLATE = """<!DOCTYPE html>
       <span class="kbd">/</span>
     </div>
   </div>
-  <div class="runner-head">Running 30 specs</div>
+  <div class="runner-head">Running __COUNT__ specs</div>
   <ul class="speclist">__NAV__</ul>
   <div class="runner-foot" id="runnerFoot">
-    <span id="footLabel">0/30 specs passed</span>
+    <span id="footLabel">0/__COUNT__ specs passed</span>
     <button id="resetBtn" type="button">Reset run</button>
   </div>
 </nav>
@@ -192,12 +216,12 @@ TEMPLATE = """<!DOCTYPE html>
     <div class="hero">
       <div class="console">
         <div><span class="prompt">$</span> <span class="cmd">npx playwright test</span> <span class="flag">--project=typescript-fundamentals</span></div>
-        <div class="out">Running 30 specs with 1 worker<span class="caret"></span></div>
+        <div class="out">Running __COUNT__ specs with 1 worker<span class="caret"></span></div>
       </div>
       <h1>TypeScript for <em>test automation engineers</em></h1>
       <p class="lede">A working reference for QA engineers moving from manual testing, JavaScript, or Java into Playwright with TypeScript. Every example is written the way you would actually write it inside a framework. Free to read, free to fork, free to teach from.</p>
       <div class="hero-meta">
-        <span class="chip"><b>30</b> sections</span>
+        <span class="chip"><b>__COUNT__</b> sections</span>
         <span class="chip">Playwright <b>+</b> TypeScript</span>
         <span class="chip">strict mode <b>on</b></span>
         <span class="chip">Node <b>20+</b></span>
@@ -238,8 +262,9 @@ TEMPLATE = """<!DOCTYPE html>
 def main():
     here = os.path.dirname(os.path.abspath(__file__))
     sections = parse_sections(open(SRC_MD, encoding="utf-8").read())
-    if len(sections) != 30:
-        raise SystemExit("Expected 30 sections, found %d" % len(sections))
+    if len(sections) != SECTION_COUNT:
+        raise SystemExit("Expected %d sections, found %d"
+                         % (SECTION_COUNT, len(sections)))
 
     nav, specs = [], []
     for s in sections:
@@ -273,7 +298,13 @@ def main():
             .replace("__URL__", SITE_URL)
             .replace("__REPO__", f"https://github.com/{GITHUB_USER}/{REPO_NAME}")
             .replace("__USER__", GITHUB_USER)
+            .replace("__COUNT__", str(SECTION_COUNT))
             .replace("__DATE__", date.today().strftime("%d %B %Y")))
+
+    if "BLOCKTOKEN" in page:
+        raise SystemExit("A code block or widget token survived conversion. "
+                         "Tokens must sit on their own line, with a blank "
+                         "line either side.")
 
     os.makedirs(OUT_DIR, exist_ok=True)
     open(os.path.join(OUT_DIR, "index.html"), "w", encoding="utf-8").write(page)

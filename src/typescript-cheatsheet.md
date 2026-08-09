@@ -30,15 +30,16 @@
 | 19 | [Modules: import and export](#19-modules-import-and-export) |
 | 20 | [Utility types](#20-utility-types) |
 | 21 | [Async, await and Promises](#21-async-await-and-promises) |
-| 22 | [Modern JavaScript essentials](#22-modern-javascript-essentials-you-will-use-daily) |
-| 23 | [tsconfig.json explained](#23-tsconfigjson-explained) |
-| 24 | [Typing test data, JSON and environment variables](#24-typing-test-data-json-and-environment-variables) |
-| 25 | [Playwright specific TypeScript patterns](#25-playwright-specific-typescript-patterns) |
-| 26 | [Common compiler errors and how to fix them](#26-common-compiler-errors-and-how-to-fix-them) |
-| 27 | [Best practices](#27-best-practices) |
-| 28 | [Common pitfalls](#28-common-pitfalls) |
-| 29 | [Practice exercises](#29-practice-exercises) |
-| 30 | [One page summary](#30-one-page-summary) |
+| 22 | [Promises and flaky tests: a visual guide](#22-promises-and-flaky-tests-a-visual-guide) |
+| 23 | [Modern JavaScript essentials](#23-modern-javascript-essentials-you-will-use-daily) |
+| 24 | [tsconfig.json explained](#24-tsconfigjson-explained) |
+| 25 | [Typing test data, JSON and environment variables](#25-typing-test-data-json-and-environment-variables) |
+| 26 | [Playwright specific TypeScript patterns](#26-playwright-specific-typescript-patterns) |
+| 27 | [Common compiler errors and how to fix them](#27-common-compiler-errors-and-how-to-fix-them) |
+| 28 | [Best practices](#28-best-practices) |
+| 29 | [Common pitfalls](#29-common-pitfalls) |
+| 30 | [Practice exercises](#30-practice-exercises) |
+| 31 | [One page summary](#31-one-page-summary) |
 
 ---
 
@@ -1419,11 +1420,248 @@ try {
 
 **Pitfall:** never wrap a Playwright `expect` in try/catch to "handle" the failure. That silently converts a real failure into a pass. Use `expect.soft()` if you want the test to continue after a non blocking assertion.
 
+Section 22 takes the same ground apart visually: what a promise looks like inside a variable, a function and a class, and how each mistake becomes a test that only fails in CI.
+
 ---
 
-## 22. Modern JavaScript essentials you will use daily
+## 22. Promises and flaky tests: a visual guide
 
-### 22.1 Template literals
+Section 21 covered the syntax. This section covers the model behind it, because most flaky tests are not a Playwright problem and not a timing problem. They are a promise problem. What follows is what a promise actually is, what it does inside a variable, a function and a class, and exactly how each mistake turns into a test that only fails in CI.
+
+### 22.1 A promise is a receipt, not the thing
+
+You order a flat white. The barista does not hand you coffee. She hands you a buzzer, immediately, before any coffee exists.
+
+The buzzer is a promise. It is a real object you can hold right now. It is not coffee, you cannot drink it, and it tells you nothing about how the coffee tastes. It is a guarantee that coffee is coming, plus a way to find out when.
+
+[widget:promise-receipt]
+
+Three things follow from that, and between them they explain nearly every promise bug:
+
+- **The receipt arrives instantly.** Calling an async function never blocks. The next line of your test runs immediately.
+- **The receipt is a real object.** It has a type, it is truthy, you can store it in a variable and pass it around. It just is not the value.
+- **`await` is the only thing that swaps it for the value.** Waiting at the counter is a deliberate act. Skip it and you walk out holding a buzzer.
+
+### 22.2 The three states
+
+[widget:promise-states]
+
+> [!TIP]
+> **Why this matters in a test:** a settled promise is cached. Store `const check = page.locator('.error').isVisible()` and await it three times, and you get the same answer three times, taken at the moment the promise was created. That is not a live check. It is a photograph.
+
+### 22.3 Promises in variables
+
+This is the cheapest bug to make and the hardest to spot, because nothing throws. The variable holds something. It just holds the wrong thing.
+
+```ts
+// BROKEN: the variable holds the receipt
+const pending = page.title();      // Promise<string>, not string
+pending === 'Dashboard';           // always false
+pending.toUpperCase();             // TypeError: not a function
+
+// CORRECT: the variable holds the value
+const title = await page.title();  // string, so the comparison means something
+```
+
+[widget:await-unwraps]
+
+#### The silent killer: a promise as a condition
+
+Every object in JavaScript is truthy, and a pending promise is an object. So this `if` never evaluates to false, no matter what the page is showing.
+
+```ts
+// BROKEN: the branch is always taken
+if (page.locator('.error').isVisible()) {
+  throw new Error('Unexpected error banner');
+}
+
+// CORRECT
+if (await page.locator('.error').isVisible()) {
+  throw new Error('Unexpected error banner');
+}
+```
+
+> [!WARNING]
+> **Why this is worse than a crash:** a crash tells you where it is. This produces a test that reports green while checking nothing, or red while checking nothing. It is a false signal in both directions, and it can sit in a suite for a year.
+
+#### The photograph problem
+
+Because a settled promise is frozen, storing one and reusing it gives you a stale reading. The real world version is checking the departures board once, photographing it, then consulting the photo all afternoon.
+
+```ts
+// BROKEN: the answer is taken before the click, not after
+const spinnerVisible = page.locator('.spinner').isVisible();
+await page.getByRole('button', { name: 'Load' }).click();
+if (await spinnerVisible) { /* answers the question from BEFORE the click */ }
+```
+
+> [!TIP]
+> **The rule:** in a test, await a promise on the line that creates it. A promise parked in a variable for later is almost always a bug. The exception is deliberate parallelism, covered in 22.8.
+
+### 22.4 Promises in functions
+
+Adding `async` to a function does one thing: it wraps whatever you return in a promise. You cannot opt out.
+
+```ts
+async function getName(): Promise<string> {
+  return 'Nigel';                // you return a string
+}                                // callers receive Promise<string>
+
+const a = getName();             // Promise<string>
+const b = await getName();       // string
+```
+
+#### The floating promise
+
+A promise nobody awaits is a floating promise. Real world: you press start on the photocopier and walk straight back to your desk. The copying still happens. You just have no idea when it finishes, and you are not there if it jams.
+
+[widget:floating-promise]
+
+#### The loop trap
+
+`forEach` does not understand async. It calls your callback, gets a promise back, and throws it away. Every iteration starts at once, and the loop reports done before any of them finish.
+
+[widget:loop-tabs]
+
+> [!NOTE]
+> **Memory hook:** `forEach` is fire and forget. `for...of` is one at a time. `Promise.all` is all at once, on purpose, and you waited for them.
+
+### 22.5 Promises in classes
+
+A constructor must return the object immediately and synchronously. That is a language rule, not a style choice. So a constructor can *start* async work, but it can never *wait* for it.
+
+Real world: the contractor hands you the keys the moment you sign, while the kitchen is still being installed. You have a house object. It is not ready.
+
+```ts
+// BROKEN: a race condition baked into the page object
+class DashboardPage {
+  patientCount!: number;
+
+  constructor(private readonly page: Page) {
+    this.load();          // floating: the constructor returns before this finishes
+  }
+
+  private async load(): Promise<void> {
+    this.patientCount = await this.page.locator('.row').count();
+  }
+}
+
+const dash = new DashboardPage(page);
+expect(dash.patientCount).toBe(12);   // undefined... sometimes
+```
+
+[widget:constructor-race]
+
+#### Three ways out
+
+[widget:class-fix-tabs]
+
+> [!WARNING]
+> **The class field trap:** `private ready = this.init();` looks tidy and is the same bug wearing a suit. The field holds a pending promise, and nothing forces anyone to await it.
+
+### 22.6 Why this becomes flakiness
+
+A missing `await` does not always fail. Playwright's `expect` retries for up to five seconds, so if the forgotten action lands inside that window the test passes and nobody notices.
+
+Then CI runs eight workers on a loaded box, the action takes longer than the retry budget, and the test fails. Nothing changed except the timing. That gap between "usually wins the race" and "sometimes loses it" is exactly what flakiness is.
+
+[widget:race-simulator]
+
+The awaited lane is unaffected by machine speed, because ordering is guaranteed by the language rather than by luck. The unawaited lane is fine until it is not, and the threshold sits somewhere you will never find on your own laptop.
+
+> [!WARNING]
+> **This is why "it passes locally" is not evidence.** Your laptop is the fastest, quietest machine the test will ever run on. It is the environment least likely to expose a race.
+
+#### The five patterns, ranked by how often they bite
+
+| Pattern | What you see | Fix |
+|---|---|---|
+| Missing `await` on an action | Intermittent failure on the *next* step, not the guilty one | `no-floating-promises` |
+| Promise used as a condition | Branch always taken. Test green but checking nothing | `no-misused-promises` |
+| `async` inside `forEach` | Counts wrong, data missing, order scrambled | `for...of`, or `Promise.all` with `map` |
+| Async work in a constructor | `undefined` field, worse under parallel workers | Static factory, or a fixture |
+| Unhandled rejection | A *later, unrelated* test fails. Debugging goes to the wrong file | Await it, or handle it explicitly |
+
+> [!NOTE]
+> **The tell:** when the failing assertion is not the broken one, suspect a floating promise on an earlier line. Promise bugs report themselves one step downstream of the cause, which is why they eat so much debugging time.
+
+### 22.7 Diagnosis: is my flaky test a promise problem?
+
+[widget:diagnosis-flow]
+
+### 22.8 The fix list
+
+The highest value change is the first one. Four rules eliminate most of the category at build time, before anyone runs a test.
+
+```jsonc
+// eslint.config.js rules
+{
+  // an async call whose promise is never awaited or returned
+  "@typescript-eslint/no-floating-promises": "error",
+
+  // a promise used as a condition, or passed where a sync function is expected
+  "@typescript-eslint/no-misused-promises": "error",
+
+  // await on something that is not a promise, usually a typo or a wrong call
+  "@typescript-eslint/await-thenable": "error",
+
+  // async on a function with no await, often a leftover
+  "@typescript-eslint/require-await": "warn"
+}
+```
+
+> [!TIP]
+> **These need type information.** Point your ESLint config at your `tsconfig.json`, or the rules silently do nothing. Verify by deleting an `await` on purpose and checking that the lint run fails.
+
+Then the habits that remove the rest:
+
+- **Await on the line that creates the promise.** Do not store promises in variables for later unless you are deliberately parallelising.
+- **Never `waitForTimeout`.** A fixed sleep is a bet on machine speed. It is the bug and the workaround at the same time.
+- **Use web first assertions.** `await expect(locator).toBeVisible()` polls until true. `expect(await locator.isVisible())` checks once and is a coin flip.
+- **Store a `Locator`, never an `ElementHandle`.** A locator re-resolves on every use. A handle is a photograph of the DOM.
+- **Keep constructors synchronous.** Async setup belongs in a static factory or a fixture.
+- **`for...of` in tests, not `forEach`.** Make `Promise.all` a deliberate decision you can defend in review.
+- **Run with `--repeat-each=5` before merging.** Races that hide at one run per commit surface quickly at five.
+
+#### The one place Promise.all is required
+
+Waiting for a network response triggered by a click is the case people get backwards. Await the wait first and you deadlock: the click never happens, so the response never comes.
+
+```ts
+// BROKEN: waits forever, the click is never reached
+await page.waitForResponse('**/api/save');
+await page.getByRole('button', { name: 'Save' }).click();
+
+// CORRECT: start listening, then click
+const [response] = await Promise.all([
+  page.waitForResponse('**/api/save'),
+  page.getByRole('button', { name: 'Save' }).click(),
+]);
+expect(response.status()).toBe(200);
+```
+
+Both promises are created before either is awaited, so the listener is already in place when the click fires. Memorise this one, because the broken version fails in the most confusing way available: a hang, then a timeout, on a line that looks correct.
+
+### 22.9 The whole section in nine lines
+
+1. A promise is a receipt. Holding it is not holding the value.
+2. `await` is the only thing that unwraps it.
+3. A promise is an object, so it is always truthy. Never use one as a condition.
+4. A settled promise is frozen. Stored promises give stale answers.
+5. `async` always wraps the return value, whether you want it to or not.
+6. `forEach` throws your promises away. Use `for...of`.
+7. Constructors cannot await. Use a static factory or a fixture.
+8. A missing `await` is not a broken test, it is a race, and races are decided by machine speed.
+9. Four ESLint rules find nearly all of it before a test ever runs.
+
+> [!TIP]
+> **If you take one thing from this section:** when a test fails on a line that looks innocent, read upward. Promise bugs surface one step after the mistake, and that displacement is what makes them expensive.
+
+---
+
+## 23. Modern JavaScript essentials you will use daily
+
+### 23.1 Template literals
 
 ```ts
 const env = 'qa';
@@ -1442,7 +1680,7 @@ type Env = 'dev' | 'qa';
 type BaseUrl = `https://${Env}.example.com`;   // 'https://dev.example.com' | 'https://qa.example.com'
 ```
 
-### 22.2 Destructuring
+### 23.2 Destructuring
 
 ```ts
 const { firstName, nhsNumber } = patient;
@@ -1454,7 +1692,7 @@ const { clinician: { name: clinicianName } } = appointment;   // nested
 test('example', async ({ page, request, browserName }) => { /* ... */ });
 ```
 
-### 22.3 Spread and rest
+### 23.3 Spread and rest
 
 ```ts
 const defaults = { retries: 2, timeout: 30_000 };
@@ -1474,7 +1712,7 @@ copy.auth.username = 'changed';   // this ALSO changes config.auth.username
 const deepCopy = structuredClone(config);   // Node 17+, real deep copy
 ```
 
-### 22.4 Arrow functions and `this`
+### 23.4 Arrow functions and `this`
 
 ```ts
 const isActive = (p: Patient): boolean => p.active;
@@ -1483,7 +1721,7 @@ const isActive = (p: Patient): boolean => p.active;
 // Regular functions do not, which is why callbacks in classes usually use arrows.
 ```
 
-### 22.5 Optional string and array helpers you will reach for
+### 23.5 Optional string and array helpers you will reach for
 
 ```ts
 'ORD-123'.startsWith('ORD-');
@@ -1498,7 +1736,7 @@ Object.entries(patient).forEach(([key, value]) => console.log(key, value));
 
 ---
 
-## 23. tsconfig.json explained
+## 24. tsconfig.json explained
 
 A solid starting point for a Playwright framework:
 
@@ -1559,9 +1797,9 @@ A solid starting point for a Playwright framework:
 
 ---
 
-## 24. Typing test data, JSON and environment variables
+## 25. Typing test data, JSON and environment variables
 
-### 24.1 JSON test data
+### 25.1 JSON test data
 
 ```jsonc
 // fixtures/patients.json
@@ -1577,7 +1815,7 @@ import patientsJson from '../fixtures/patients.json';
 const patients: Patient[] = patientsJson;   // validated against your interface at compile time
 ```
 
-### 24.2 Environment variables are always `string | undefined`
+### 25.2 Environment variables are always `string | undefined`
 
 ```ts
 // process.env.BASE_URL is string | undefined, ALWAYS
@@ -1597,7 +1835,7 @@ function requireEnv(name: string): string {
 const apiToken = requireEnv('API_TOKEN');
 ```
 
-### 24.3 Declaring your own env types
+### 25.3 Declaring your own env types
 
 ```ts
 // types/env.d.ts
@@ -1615,7 +1853,7 @@ export {};
 
 Now `process.env.ENVIRONMNET` (typo) is a compile error, and `process.env.ENVIRONMENT` autocompletes its allowed values.
 
-### 24.4 A typed config module
+### 25.4 A typed config module
 
 ```ts
 // config/test-config.ts
@@ -1645,9 +1883,9 @@ export function getConfig(env: Environment = 'qa'): TestConfig {
 
 ---
 
-## 25. Playwright specific TypeScript patterns
+## 26. Playwright specific TypeScript patterns
 
-### 25.1 The core types you will import
+### 26.1 The core types you will import
 
 ```ts
 import {
@@ -1662,7 +1900,7 @@ import {
 } from '@playwright/test';
 ```
 
-### 25.2 Typed custom fixtures, the pattern that makes POM clean
+### 26.2 Typed custom fixtures, the pattern that makes POM clean
 
 ```ts
 // fixtures/test-fixtures.ts
@@ -1713,7 +1951,7 @@ test('valid user reaches the dashboard', async ({ loginPage, dashboardPage }) =>
 
 Every fixture is fully typed and autocompletes in the destructured parameter list. New engineers discover the available page objects just by typing `{`.
 
-### 25.3 Typed data driven tests
+### 26.3 Typed data driven tests
 
 ```ts
 interface LoginCase {
@@ -1740,7 +1978,7 @@ for (const testCase of invalidLogins) {
 
 Add a field to `LoginCase` and the compiler lists every case you have not updated. That is exactly the maintainability property you want when the suite has 400 tests.
 
-### 25.4 Typing `page.evaluate`
+### 26.4 Typing `page.evaluate`
 
 Code inside `evaluate` runs in the browser, not in Node. Types do not automatically cross that boundary.
 
@@ -1762,7 +2000,7 @@ declare global {
 const appVersion = await page.evaluate(() => window.appVersion);
 ```
 
-### 25.5 Typed API response assertions
+### 26.5 Typed API response assertions
 
 ```ts
 interface ErrorResponse {
@@ -1784,7 +2022,7 @@ test('rejects invalid NHS number', async ({ request }) => {
 });
 ```
 
-### 25.6 A typed custom matcher
+### 26.6 A typed custom matcher
 
 ```ts
 import { expect as baseExpect } from '@playwright/test';
@@ -1805,7 +2043,7 @@ await expect(patient.nhsNumber).toBeValidNhsNumber();
 
 ---
 
-## 26. Common compiler errors and how to fix them
+## 27. Common compiler errors and how to fix them
 
 | Error | Meaning | Fix |
 |---|---|---|
@@ -1824,7 +2062,7 @@ await expect(patient.nhsNumber).toBeValidNhsNumber();
 
 ---
 
-## 27. Best practices
+## 28. Best practices
 
 ### Type safety
 
@@ -1879,7 +2117,7 @@ eslint.config.js
 
 ---
 
-## 28. Common pitfalls
+## 29. Common pitfalls
 
 | Pitfall | Why it hurts | Do this instead |
 |---|---|---|
@@ -1898,7 +2136,7 @@ eslint.config.js
 
 ---
 
-## 29. Practice exercises
+## 30. Practice exercises
 
 Good starter tasks for a manual tester learning TypeScript. Roughly in order of difficulty.
 
@@ -1915,7 +2153,7 @@ Good starter tasks for a manual tester learning TypeScript. Roughly in order of 
 
 ---
 
-## 30. One page summary
+## 31. One page summary
 
 ### Syntax cheat card
 
@@ -1981,9 +2219,9 @@ import { x, type Y } from './module';
 |---|---|
 | 1 | Sections 1 to 8: types, inference, arrays, objects, functions |
 | 2 | Sections 9 to 14: interfaces, type aliases, unions, narrowing, enums |
-| 3 | Section 15 and 25: classes, POM, Playwright fixtures. Write a real page object |
-| 4 | Sections 16 to 21: generics, assertions, modules, utility types, async |
-| 5 | Sections 22 to 24 and 27: tsconfig, config typing, best practices. Review a teammate's PR |
+| 3 | Section 15 and 26: classes, POM, Playwright fixtures. Write a real page object |
+| 4 | Sections 16 to 22: generics, assertions, modules, utility types, async and promises |
+| 5 | Sections 23 to 25 and 28: tsconfig, config typing, best practices. Review a teammate's PR |
 
 ### Further reading
 

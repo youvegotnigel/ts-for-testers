@@ -277,9 +277,11 @@ a:hover { border-bottom-color: currentColor; }
 
 /* ---------- spec section ---------- */
 
+/* The landing offset for #anchors comes from html { scroll-padding-top }.
+   A scroll-margin-top here as well would stack on top of it and drop the
+   heading twice as far down as intended. */
 .spec {
   border-top: 1px solid var(--line); padding-top: 26px; margin-top: 44px;
-  scroll-margin-top: calc(var(--topbar-h) + 20px);
 }
 .spec.hidden { display: none; }
 
@@ -357,6 +359,136 @@ a:hover { border-bottom-color: currentColor; }
 .prose tbody tr:last-child td { border-bottom: none; }
 .prose tbody tr:hover { background: var(--bg-3); }
 .prose tbody td:first-child { color: var(--text); }
+
+/* ---------- callouts : GitHub style alerts ---------- */
+
+.prose blockquote.tip  { border-left-color: var(--green); background: var(--green-dim); }
+.prose blockquote.warn { border-left-color: var(--red);   background: var(--red-dim); }
+
+/* ---------- figures : inline SVG diagrams ---------- */
+
+.prose .fig {
+  margin: 0 0 22px; padding: 18px;
+  background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+.fig-scroll { overflow-x: auto; }
+.fig figcaption {
+  margin-top: 12px; text-align: center; line-height: 1.55;
+  font-family: var(--mono); font-size: 11.5px; color: var(--text-3);
+}
+
+.diagram { display: block; width: 100%; height: auto; }
+.d-box   { fill: var(--bg-3); stroke: var(--line); }
+.d-label { font-family: var(--mono); font-size: 11px; fill: var(--text-2); }
+.d-title { font-family: var(--sans); font-size: 12.5px; font-weight: 600; fill: var(--text); }
+.d-sub   { font-family: var(--mono); font-size: 10px; fill: var(--text-3); }
+.d-arrow { fill: none; stroke: var(--text-3); stroke-width: 1.4; }
+
+/* ---------- tabbed comparisons ---------- */
+
+.prose .flip { margin: 0 0 20px; }
+.flip-tabs {
+  display: flex; flex-wrap: wrap; width: fit-content; max-width: 100%;
+  margin-bottom: 12px;
+  border: 1px solid var(--line); border-radius: 9px; overflow: hidden;
+}
+.flip-tab {
+  padding: 6px 14px; background: transparent;
+  border: none; border-right: 1px solid var(--line);
+  color: var(--text-3); font-family: var(--mono); font-size: 11.5px;
+  cursor: pointer; transition: background .15s, color .15s;
+}
+.flip-tab:last-child { border-right: none; }
+.flip-tab:hover { color: var(--text); background: var(--bg-3); }
+.flip-tab[aria-selected="true"] {
+  background: var(--bg-3); color: var(--text);
+  box-shadow: inset 0 -2px 0 var(--amber);
+}
+.flip-pane > *:last-child { margin-bottom: 0; }
+
+/* ---------- the race simulator ---------- */
+
+.sim {
+  margin: 0 0 22px; padding: 18px;
+  background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+.sim-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+.prose .sim-head h4 { margin: 0; font-size: 14px; }
+.sim-hint { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--text-3); }
+
+.sim-row { display: flex; align-items: center; gap: 12px; }
+.sim-range {
+  flex: 1; -webkit-appearance: none; appearance: none;
+  height: 4px; border-radius: 3px; background: var(--line); outline: none;
+}
+.sim-range::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 17px; height: 17px; border-radius: 50%;
+  background: var(--amber); border: 3px solid var(--bg-2); cursor: pointer;
+}
+.sim-range::-moz-range-thumb {
+  width: 17px; height: 17px; border-radius: 50%;
+  background: var(--amber); border: 3px solid var(--bg-2); cursor: pointer;
+}
+.sim-val {
+  min-width: 76px; text-align: right; font-variant-numeric: tabular-nums;
+  font-family: var(--mono); font-size: 12.5px; color: var(--amber);
+}
+
+.sim-presets { display: flex; flex-wrap: wrap; gap: 7px; margin: 12px 0 18px; }
+.sim-preset {
+  padding: 4px 10px; border: 1px solid var(--line); border-radius: 999px;
+  background: transparent; color: var(--text-2);
+  font-family: var(--mono); font-size: 11px; cursor: pointer; transition: all .15s;
+}
+.sim-preset:hover, .sim-preset.on { border-color: var(--amber); color: var(--amber); background: var(--amber-dim); }
+
+.lane { margin-bottom: 14px; }
+.lane-top { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; margin-bottom: 6px; }
+.lane-name { font-family: var(--mono); font-size: 11.5px; color: var(--text-2); }
+.verdict {
+  margin-left: auto; padding: 2px 9px; border-radius: 5px;
+  font-family: var(--mono); font-size: 11px; letter-spacing: .05em;
+}
+.verdict.pass { background: var(--green-dim); color: var(--green); }
+.verdict.fail { background: var(--red-dim); color: var(--red); }
+
+.track {
+  position: relative; height: 48px; overflow: hidden;
+  background: var(--code-bg); border: 1px solid var(--line); border-radius: 7px;
+}
+.bar {
+  position: absolute; height: 9px; border-radius: 5px;
+  transition: left .3s ease, width .3s ease, background-color .3s ease;
+}
+.bar.action { top: 7px; background: var(--blue); }
+.bar.assert { top: 21px; background: var(--amber); }
+.bar.assert.pass { background: var(--green); }
+.bar.assert.fail { background: var(--red); }
+
+.sim-marker { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--text-3); }
+.sim-marker span {
+  /* below both bars, where nothing else is drawn */
+  position: absolute; bottom: 3px; left: 5px; white-space: nowrap;
+  padding: 0 3px; border-radius: 3px; background: var(--code-bg);
+  font-family: var(--mono); font-size: 9px; color: var(--text-3);
+}
+/* near the right hand end, hang the label off the other side */
+.sim-marker.flip span { left: auto; right: 5px; }
+
+.sim-legend {
+  display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 4px;
+  font-family: var(--mono); font-size: 10.5px; color: var(--text-3);
+}
+.sim-legend i { display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+
+.prose .sim-verdict {
+  margin: 14px 0 0; padding: 11px 14px; border-radius: 8px;
+  font-family: var(--mono); font-size: 12px; line-height: 1.6;
+}
+.sim-verdict.ok  { background: var(--green-dim); color: var(--green); }
+.sim-verdict.bad { background: var(--red-dim);   color: var(--red); }
 
 /* ---------- code blocks : editor panels ---------- */
 
@@ -466,6 +598,13 @@ mark { background: var(--amber-dim); color: var(--amber); border-radius: 3px; pa
   .brand-name { display: none; }
   .spec > h2 { font-size: 22px; }
   .codeblock pre { font-size: 12.2px; }
+
+  /* diagrams keep their drawn size and scroll, rather than shrinking
+     the labels below readable */
+  .prose .fig, .sim { padding: 13px; }
+  .diagram { min-width: 520px; }
+  .sim-hint { display: none; }
+  .sim-val { min-width: 62px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -475,8 +614,13 @@ mark { background: var(--amber-dim); color: var(--amber); border-radius: 3px; pa
 
 @media print {
   .topbar, .sidebar, .rail, .totop, .copy, .markdone, .scrim { display: none !important; }
+  .sim-presets, .sim-row { display: none !important; }
   .main { margin: 0; padding: 0; }
   .spec { break-inside: avoid; }
+  .fig, .sim { break-inside: avoid; }
+  /* every tab pane on paper, since nothing can be clicked */
+  .flip-tabs { display: none !important; }
+  .flip-pane[hidden] { display: block !important; }
   body { background: #fff; color: #000; }
 }
 

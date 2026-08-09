@@ -103,7 +103,8 @@
 
   var search = document.getElementById('search');
   var noResults = document.getElementById('noResults');
-  var index = specs.map(function (s) { return s.innerText.toLowerCase(); });
+  /* textContent, not innerText, so collapsed tab panes stay searchable */
+  var index = specs.map(function (s) { return s.textContent.toLowerCase(); });
 
   function runSearch() {
     var q = search.value.trim().toLowerCase();
@@ -138,13 +139,7 @@
 
   /* ---------- active section tracking ---------- */
 
-  function markActive() {
-    var offset = 140;
-    var current = 0;
-    for (var i = 0; i < specs.length; i++) {
-      if (specs[i].classList.contains('hidden')) continue;
-      if (specs[i].getBoundingClientRect().top <= offset) current = i;
-    }
+  function highlight(current) {
     items.forEach(function (li, i) { li.classList.toggle('active', i === current); });
 
     var active = items[current];
@@ -155,7 +150,16 @@
         list.scrollTo({ top: top - list.clientHeight / 2, behavior: 'smooth' });
       }
     }
+  }
 
+  function markActive() {
+    var offset = 140;
+    var current = 0;
+    for (var i = 0; i < specs.length; i++) {
+      if (specs[i].classList.contains('hidden')) continue;
+      if (specs[i].getBoundingClientRect().top <= offset) current = i;
+    }
+    highlight(current);
     document.getElementById('toTop').classList.toggle('show', window.scrollY > 700);
   }
 
@@ -200,9 +204,108 @@
     toggleNav(!sidebar.classList.contains('open'));
   });
   scrim.addEventListener('click', function () { toggleNav(false); });
-  document.querySelectorAll('.speclist a').forEach(function (a) {
+  document.querySelectorAll('.speclist a').forEach(function (a, i) {
     a.addEventListener('click', function () {
+      /* mark it straight away: clicking the last spec, or one already in
+         view, scrolls too little to fire a scroll event */
+      highlight(i);
       if (window.innerWidth <= 860) toggleNav(false);
     });
+  });
+
+  /* ---------- tabbed comparisons ---------- */
+
+  document.querySelectorAll('.flip-tabs').forEach(function (tablist) {
+    var tabs = Array.prototype.slice.call(tablist.querySelectorAll('.flip-tab'));
+    var panes = tabs.map(function (tab) {
+      return document.getElementById(tab.getAttribute('aria-controls'));
+    });
+
+    function select(i, moveFocus) {
+      tabs.forEach(function (tab, j) {
+        var on = i === j;
+        tab.setAttribute('aria-selected', String(on));
+        tab.tabIndex = on ? 0 : -1;
+        if (panes[j]) panes[j].hidden = !on;
+      });
+      if (moveFocus) tabs[i].focus();
+    }
+
+    tabs.forEach(function (tab, i) {
+      tab.addEventListener('click', function () { select(i, false); });
+      tab.addEventListener('keydown', function (e) {
+        if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+        var next = i + (e.key === 'ArrowRight' ? 1 : -1);
+        if (next < 0 || next >= tabs.length) return;
+        e.preventDefault();
+        select(next, true);
+      });
+    });
+  });
+
+  /* ---------- the race simulator ----------
+     Two lanes run the same test. The awaited lane is ordered by the
+     language; the floating lane is ordered by luck. Slide the machine
+     speed and watch only one of them break. */
+
+  var RETRY_BUDGET = 500;   /* scaled stand-in for Playwright's 5s expect timeout */
+  var HEAD_START = 40;      /* how far the unawaited test runs ahead */
+
+  document.querySelectorAll('[data-sim]').forEach(function (sim) {
+    var range = sim.querySelector('.sim-range');
+    var readout = sim.querySelector('[data-val]');
+    var summary = sim.querySelector('[data-sim-verdict]');
+    var marker = sim.querySelector('[data-marker]');
+    var presets = Array.prototype.slice.call(sim.querySelectorAll('.sim-preset'));
+
+    var bars = {};
+    sim.querySelectorAll('[data-bar]').forEach(function (b) { bars[b.dataset.bar] = b; });
+    var verdicts = {};
+    sim.querySelectorAll('[data-verdict]').forEach(function (v) { verdicts[v.dataset.verdict] = v; });
+
+    function place(el, left, width) {
+      el.style.left = left + '%';
+      el.style.width = Math.max(width, 1.5) + '%';
+    }
+
+    function render() {
+      var ms = +range.value;
+      var deadline = HEAD_START + RETRY_BUDGET;
+      var span = Math.max(ms + RETRY_BUDGET, 700);
+      function pct(v) { return v / span * 100; }
+
+      readout.textContent = ms + ' ms';
+
+      /* awaited: the click finishes, then the assertion starts */
+      place(bars['1a'], 0, pct(ms));
+      place(bars['1b'], pct(ms), pct(60));
+
+      /* floating: the assertion starts early and polls until it gives up */
+      var passes = ms <= deadline;
+      place(bars['2a'], 0, pct(ms));
+      place(bars['2b'], pct(HEAD_START), pct(Math.max((passes ? ms : deadline) - HEAD_START, 20)));
+      bars['2b'].className = 'bar assert ' + (passes ? 'pass' : 'fail');
+      verdicts['2'].className = 'verdict ' + (passes ? 'pass' : 'fail');
+      verdicts['2'].textContent = passes ? 'passed' : 'failed';
+      marker.style.left = pct(deadline) + '%';
+      marker.classList.toggle('flip', pct(deadline) > 55);
+
+      summary.className = 'sim-verdict ' + (passes ? 'ok' : 'bad');
+      summary.textContent = passes
+        ? 'Passing by luck. The click finishes at ' + ms + ' ms, inside the '
+          + deadline + ' ms retry budget, so the assertion catches it. '
+          + 'Nothing in the code guarantees that.'
+        : 'Failed. The click finishes at ' + ms + ' ms, past the ' + deadline
+          + ' ms retry budget. Identical code, slower box. '
+          + 'This is the CI only failure.';
+
+      presets.forEach(function (p) { p.classList.toggle('on', +p.dataset.ms === ms); });
+    }
+
+    range.addEventListener('input', render);
+    presets.forEach(function (p) {
+      p.addEventListener('click', function () { range.value = p.dataset.ms; render(); });
+    });
+    render();
   });
 })();

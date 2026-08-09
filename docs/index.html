@@ -4,19 +4,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TypeScript for Test Automation Engineers</title>
-<meta name="description" content="A free interactive TypeScript reference for QA engineers moving into Playwright. 30 sections covering types, interfaces, classes, generics, utility types and the Page Object Model, with runnable examples.">
+<meta name="description" content="A free interactive TypeScript reference for QA engineers moving into Playwright. 31 sections covering types, interfaces, classes, generics, utility types, the Page Object Model and a visual guide to promises and flaky tests, with runnable examples.">
 <meta name="author" content="youvegotnigel">
 <link rel="canonical" href="https://youvegotnigel.github.io/ts-for-testers/">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 
 <meta property="og:type" content="article">
 <meta property="og:title" content="TypeScript for Test Automation Engineers">
-<meta property="og:description" content="A free interactive TypeScript reference for QA engineers moving into Playwright. 30 sections covering types, interfaces, classes, generics, utility types and the Page Object Model, with runnable examples.">
+<meta property="og:description" content="A free interactive TypeScript reference for QA engineers moving into Playwright. 31 sections covering types, interfaces, classes, generics, utility types, the Page Object Model and a visual guide to promises and flaky tests, with runnable examples.">
 <meta property="og:url" content="https://youvegotnigel.github.io/ts-for-testers/">
 <meta property="og:site_name" content="TypeScript for Test Automation Engineers">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="TypeScript for Test Automation Engineers">
-<meta name="twitter:description" content="A free interactive TypeScript reference for QA engineers moving into Playwright. 30 sections covering types, interfaces, classes, generics, utility types and the Page Object Model, with runnable examples.">
+<meta name="twitter:description" content="A free interactive TypeScript reference for QA engineers moving into Playwright. 31 sections covering types, interfaces, classes, generics, utility types, the Page Object Model and a visual guide to promises and flaky tests, with runnable examples.">
 
 <meta name="theme-color" content="#10151F">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -301,9 +301,11 @@ a:hover { border-bottom-color: currentColor; }
 
 /* ---------- spec section ---------- */
 
+/* The landing offset for #anchors comes from html { scroll-padding-top }.
+   A scroll-margin-top here as well would stack on top of it and drop the
+   heading twice as far down as intended. */
 .spec {
   border-top: 1px solid var(--line); padding-top: 26px; margin-top: 44px;
-  scroll-margin-top: calc(var(--topbar-h) + 20px);
 }
 .spec.hidden { display: none; }
 
@@ -381,6 +383,136 @@ a:hover { border-bottom-color: currentColor; }
 .prose tbody tr:last-child td { border-bottom: none; }
 .prose tbody tr:hover { background: var(--bg-3); }
 .prose tbody td:first-child { color: var(--text); }
+
+/* ---------- callouts : GitHub style alerts ---------- */
+
+.prose blockquote.tip  { border-left-color: var(--green); background: var(--green-dim); }
+.prose blockquote.warn { border-left-color: var(--red);   background: var(--red-dim); }
+
+/* ---------- figures : inline SVG diagrams ---------- */
+
+.prose .fig {
+  margin: 0 0 22px; padding: 18px;
+  background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+.fig-scroll { overflow-x: auto; }
+.fig figcaption {
+  margin-top: 12px; text-align: center; line-height: 1.55;
+  font-family: var(--mono); font-size: 11.5px; color: var(--text-3);
+}
+
+.diagram { display: block; width: 100%; height: auto; }
+.d-box   { fill: var(--bg-3); stroke: var(--line); }
+.d-label { font-family: var(--mono); font-size: 11px; fill: var(--text-2); }
+.d-title { font-family: var(--sans); font-size: 12.5px; font-weight: 600; fill: var(--text); }
+.d-sub   { font-family: var(--mono); font-size: 10px; fill: var(--text-3); }
+.d-arrow { fill: none; stroke: var(--text-3); stroke-width: 1.4; }
+
+/* ---------- tabbed comparisons ---------- */
+
+.prose .flip { margin: 0 0 20px; }
+.flip-tabs {
+  display: flex; flex-wrap: wrap; width: fit-content; max-width: 100%;
+  margin-bottom: 12px;
+  border: 1px solid var(--line); border-radius: 9px; overflow: hidden;
+}
+.flip-tab {
+  padding: 6px 14px; background: transparent;
+  border: none; border-right: 1px solid var(--line);
+  color: var(--text-3); font-family: var(--mono); font-size: 11.5px;
+  cursor: pointer; transition: background .15s, color .15s;
+}
+.flip-tab:last-child { border-right: none; }
+.flip-tab:hover { color: var(--text); background: var(--bg-3); }
+.flip-tab[aria-selected="true"] {
+  background: var(--bg-3); color: var(--text);
+  box-shadow: inset 0 -2px 0 var(--amber);
+}
+.flip-pane > *:last-child { margin-bottom: 0; }
+
+/* ---------- the race simulator ---------- */
+
+.sim {
+  margin: 0 0 22px; padding: 18px;
+  background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+.sim-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+.prose .sim-head h4 { margin: 0; font-size: 14px; }
+.sim-hint { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--text-3); }
+
+.sim-row { display: flex; align-items: center; gap: 12px; }
+.sim-range {
+  flex: 1; -webkit-appearance: none; appearance: none;
+  height: 4px; border-radius: 3px; background: var(--line); outline: none;
+}
+.sim-range::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 17px; height: 17px; border-radius: 50%;
+  background: var(--amber); border: 3px solid var(--bg-2); cursor: pointer;
+}
+.sim-range::-moz-range-thumb {
+  width: 17px; height: 17px; border-radius: 50%;
+  background: var(--amber); border: 3px solid var(--bg-2); cursor: pointer;
+}
+.sim-val {
+  min-width: 76px; text-align: right; font-variant-numeric: tabular-nums;
+  font-family: var(--mono); font-size: 12.5px; color: var(--amber);
+}
+
+.sim-presets { display: flex; flex-wrap: wrap; gap: 7px; margin: 12px 0 18px; }
+.sim-preset {
+  padding: 4px 10px; border: 1px solid var(--line); border-radius: 999px;
+  background: transparent; color: var(--text-2);
+  font-family: var(--mono); font-size: 11px; cursor: pointer; transition: all .15s;
+}
+.sim-preset:hover, .sim-preset.on { border-color: var(--amber); color: var(--amber); background: var(--amber-dim); }
+
+.lane { margin-bottom: 14px; }
+.lane-top { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; margin-bottom: 6px; }
+.lane-name { font-family: var(--mono); font-size: 11.5px; color: var(--text-2); }
+.verdict {
+  margin-left: auto; padding: 2px 9px; border-radius: 5px;
+  font-family: var(--mono); font-size: 11px; letter-spacing: .05em;
+}
+.verdict.pass { background: var(--green-dim); color: var(--green); }
+.verdict.fail { background: var(--red-dim); color: var(--red); }
+
+.track {
+  position: relative; height: 48px; overflow: hidden;
+  background: var(--code-bg); border: 1px solid var(--line); border-radius: 7px;
+}
+.bar {
+  position: absolute; height: 9px; border-radius: 5px;
+  transition: left .3s ease, width .3s ease, background-color .3s ease;
+}
+.bar.action { top: 7px; background: var(--blue); }
+.bar.assert { top: 21px; background: var(--amber); }
+.bar.assert.pass { background: var(--green); }
+.bar.assert.fail { background: var(--red); }
+
+.sim-marker { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--text-3); }
+.sim-marker span {
+  /* below both bars, where nothing else is drawn */
+  position: absolute; bottom: 3px; left: 5px; white-space: nowrap;
+  padding: 0 3px; border-radius: 3px; background: var(--code-bg);
+  font-family: var(--mono); font-size: 9px; color: var(--text-3);
+}
+/* near the right hand end, hang the label off the other side */
+.sim-marker.flip span { left: auto; right: 5px; }
+
+.sim-legend {
+  display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 4px;
+  font-family: var(--mono); font-size: 10.5px; color: var(--text-3);
+}
+.sim-legend i { display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+
+.prose .sim-verdict {
+  margin: 14px 0 0; padding: 11px 14px; border-radius: 8px;
+  font-family: var(--mono); font-size: 12px; line-height: 1.6;
+}
+.sim-verdict.ok  { background: var(--green-dim); color: var(--green); }
+.sim-verdict.bad { background: var(--red-dim);   color: var(--red); }
 
 /* ---------- code blocks : editor panels ---------- */
 
@@ -490,6 +622,13 @@ mark { background: var(--amber-dim); color: var(--amber); border-radius: 3px; pa
   .brand-name { display: none; }
   .spec > h2 { font-size: 22px; }
   .codeblock pre { font-size: 12.2px; }
+
+  /* diagrams keep their drawn size and scroll, rather than shrinking
+     the labels below readable */
+  .prose .fig, .sim { padding: 13px; }
+  .diagram { min-width: 520px; }
+  .sim-hint { display: none; }
+  .sim-val { min-width: 62px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -499,8 +638,13 @@ mark { background: var(--amber-dim); color: var(--amber); border-radius: 3px; pa
 
 @media print {
   .topbar, .sidebar, .rail, .totop, .copy, .markdone, .scrim { display: none !important; }
+  .sim-presets, .sim-row { display: none !important; }
   .main { margin: 0; padding: 0; }
   .spec { break-inside: avoid; }
+  .fig, .sim { break-inside: avoid; }
+  /* every tab pane on paper, since nothing can be clicked */
+  .flip-tabs { display: none !important; }
+  .flip-pane[hidden] { display: block !important; }
   body { background: #fff; color: #000; }
 }
 
@@ -533,7 +677,7 @@ mark { background: var(--amber-dim); color: var(--amber); border-radius: 3px; pa
   </div>
   <div class="run-summary">
     <span class="stat stat-pass">✓ <b id="passCount">0</b> passed</span>
-    <span class="stat stat-pend">○ <b id="pendCount">30</b> pending</span>
+    <span class="stat stat-pend">○ <b id="pendCount">31</b> pending</span>
   </div>
   <a class="icon-btn" href="https://github.com/youvegotnigel/ts-for-testers" target="_blank" rel="noopener" aria-label="View the source on GitHub">
     <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 .2a8 8 0 0 0-2.5 15.6c.4.1.5-.2.5-.4v-1.4c-2 .4-2.5-.5-2.7-1 0-.1-.5-.9-.9-1.1-.3-.2-.7-.6 0-.6.6 0 1 .6 1.2.8.7 1.2 1.8.9 2.3.7 0-.5.3-.9.5-1.1-1.8-.2-3.7-.9-3.7-4 0-.9.3-1.6.8-2.2 0-.2-.3-1 .1-2.1 0 0 .7-.2 2.2.8a7.4 7.4 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.2 0 3.1-1.9 3.8-3.7 4 .3.3.6.8.6 1.6v2.2c0 .2.1.5.5.4A8 8 0 0 0 8 .2Z"/></svg>
@@ -552,7 +696,7 @@ mark { background: var(--amber-dim); color: var(--amber); border-radius: 3px; pa
       <span class="kbd">/</span>
     </div>
   </div>
-  <div class="runner-head">Running 30 specs</div>
+  <div class="runner-head">Running 31 specs</div>
   <ul class="speclist"><li><a href="#what-is-typescript"><span class="glyph">○</span><span class="num">01</span><span class="label">What is TypeScript</span></a></li>
 <li><a href="#setup"><span class="glyph">○</span><span class="num">02</span><span class="label">Setup in five minutes</span></a></li>
 <li><a href="#variables"><span class="glyph">○</span><span class="num">03</span><span class="label">Variables: let, const, var</span></a></li>
@@ -574,17 +718,18 @@ mark { background: var(--amber-dim); color: var(--amber); border-radius: 3px; pa
 <li><a href="#modules"><span class="glyph">○</span><span class="num">19</span><span class="label">Modules: import and export</span></a></li>
 <li><a href="#utility-types"><span class="glyph">○</span><span class="num">20</span><span class="label">Utility types</span></a></li>
 <li><a href="#async-await"><span class="glyph">○</span><span class="num">21</span><span class="label">Async, await and Promises</span></a></li>
-<li><a href="#modern-js"><span class="glyph">○</span><span class="num">22</span><span class="label">Modern JavaScript essentials you will use daily</span></a></li>
-<li><a href="#tsconfig"><span class="glyph">○</span><span class="num">23</span><span class="label">tsconfig.json explained</span></a></li>
-<li><a href="#test-data-env"><span class="glyph">○</span><span class="num">24</span><span class="label">Typing test data, JSON and environment variables</span></a></li>
-<li><a href="#playwright-patterns"><span class="glyph">○</span><span class="num">25</span><span class="label">Playwright specific TypeScript patterns</span></a></li>
-<li><a href="#compiler-errors"><span class="glyph">○</span><span class="num">26</span><span class="label">Common compiler errors and how to fix them</span></a></li>
-<li><a href="#best-practices"><span class="glyph">○</span><span class="num">27</span><span class="label">Best practices</span></a></li>
-<li><a href="#pitfalls"><span class="glyph">○</span><span class="num">28</span><span class="label">Common pitfalls</span></a></li>
-<li><a href="#exercises"><span class="glyph">○</span><span class="num">29</span><span class="label">Practice exercises</span></a></li>
-<li><a href="#summary"><span class="glyph">○</span><span class="num">30</span><span class="label">One page summary</span></a></li></ul>
+<li><a href="#promises-flaky-tests"><span class="glyph">○</span><span class="num">22</span><span class="label">Promises and flaky tests: a visual guide</span></a></li>
+<li><a href="#modern-js"><span class="glyph">○</span><span class="num">23</span><span class="label">Modern JavaScript essentials you will use daily</span></a></li>
+<li><a href="#tsconfig"><span class="glyph">○</span><span class="num">24</span><span class="label">tsconfig.json explained</span></a></li>
+<li><a href="#test-data-env"><span class="glyph">○</span><span class="num">25</span><span class="label">Typing test data, JSON and environment variables</span></a></li>
+<li><a href="#playwright-patterns"><span class="glyph">○</span><span class="num">26</span><span class="label">Playwright specific TypeScript patterns</span></a></li>
+<li><a href="#compiler-errors"><span class="glyph">○</span><span class="num">27</span><span class="label">Common compiler errors and how to fix them</span></a></li>
+<li><a href="#best-practices"><span class="glyph">○</span><span class="num">28</span><span class="label">Best practices</span></a></li>
+<li><a href="#pitfalls"><span class="glyph">○</span><span class="num">29</span><span class="label">Common pitfalls</span></a></li>
+<li><a href="#exercises"><span class="glyph">○</span><span class="num">30</span><span class="label">Practice exercises</span></a></li>
+<li><a href="#summary"><span class="glyph">○</span><span class="num">31</span><span class="label">One page summary</span></a></li></ul>
   <div class="runner-foot" id="runnerFoot">
-    <span id="footLabel">0/30 specs passed</span>
+    <span id="footLabel">0/31 specs passed</span>
     <button id="resetBtn" type="button">Reset run</button>
   </div>
 </nav>
@@ -595,12 +740,12 @@ mark { background: var(--amber-dim); color: var(--amber); border-radius: 3px; pa
     <div class="hero">
       <div class="console">
         <div><span class="prompt">$</span> <span class="cmd">npx playwright test</span> <span class="flag">--project=typescript-fundamentals</span></div>
-        <div class="out">Running 30 specs with 1 worker<span class="caret"></span></div>
+        <div class="out">Running 31 specs with 1 worker<span class="caret"></span></div>
       </div>
       <h1>TypeScript for <em>test automation engineers</em></h1>
       <p class="lede">A working reference for QA engineers moving from manual testing, JavaScript, or Java into Playwright with TypeScript. Every example is written the way you would actually write it inside a framework. Free to read, free to fork, free to teach from.</p>
       <div class="hero-meta">
-        <span class="chip"><b>30</b> sections</span>
+        <span class="chip"><b>31</b> sections</span>
         <span class="chip">Playwright <b>+</b> TypeScript</span>
         <span class="chip">strict mode <b>on</b></span>
         <span class="chip">Node <b>20+</b></span>
@@ -1816,9 +1961,407 @@ npx<span class="w"> </span>playwright<span class="w"> </span><span class="nb">te
 <span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="sb">`Request failed: </span><span class="si">${</span><span class="nx">message</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
 <span class="w">  </span><span class="k">throw</span><span class="w"> </span><span class="nx">error</span><span class="p">;</span>
 <span class="p">}</span></code></pre></div>
-<p><strong>Pitfall:</strong> never wrap a Playwright <code>expect</code> in try/catch to "handle" the failure. That silently converts a real failure into a pass. Use <code>expect.soft()</code> if you want the test to continue after a non blocking assertion.</p></div><button class="markdone" type="button" aria-pressed="false"><span class="tick">○</span><span class="markdone-label">Mark as passed</span></button></section>
+<p><strong>Pitfall:</strong> never wrap a Playwright <code>expect</code> in try/catch to "handle" the failure. That silently converts a real failure into a pass. Use <code>expect.soft()</code> if you want the test to continue after a non blocking assertion.</p>
+<p>Section 22 takes the same ground apart visually: what a promise looks like inside a variable, a function and a class, and how each mistake becomes a test that only fails in CI.</p></div><button class="markdone" type="button" aria-pressed="false"><span class="tick">○</span><span class="markdone-label">Mark as passed</span></button></section>
 
-<section class="spec" id="modern-js"><div class="spec-bar"><span class="spec-file"><span class="dot"></span>22-modern-js.spec.ts</span><span class="pill">pending</span></div><h2>Modern JavaScript essentials you will use daily</h2><div class="prose"><h3>22.1 Template literals</h3>
+<section class="spec" id="promises-flaky-tests"><div class="spec-bar"><span class="spec-file"><span class="dot"></span>22-promises-flaky-tests.spec.ts</span><span class="pill">pending</span></div><h2>Promises and flaky tests: a visual guide</h2><div class="prose"><p>Section 21 covered the syntax. This section covers the model behind it, because most flaky tests are not a Playwright problem and not a timing problem. They are a promise problem. What follows is what a promise actually is, what it does inside a variable, a function and a class, and exactly how each mistake turns into a test that only fails in CI.</p>
+<h3>22.1 A promise is a receipt, not the thing</h3>
+<p>You order a flat white. The barista does not hand you coffee. She hands you a buzzer, immediately, before any coffee exists.</p>
+<p>The buzzer is a promise. It is a real object you can hold right now. It is not coffee, you cannot drink it, and it tells you nothing about how the coffee tastes. It is a guarantee that coffee is coming, plus a way to find out when.</p>
+<figure class="fig"><div class="fig-scroll"><svg class="diagram" viewBox="0 0 660 150" role="img" aria-label="Ordering coffee returns a buzzer immediately, the coffee or an error arrives later">
+<defs><marker id="ah-receipt" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor" style="color:var(--text-3)"/></marker></defs>
+<text class="d-label" x="8" y="24" style="fill:var(--text-3)">TIME →</text>
+<line x1="8" y1="34" x2="652" y2="34" stroke="var(--line)" stroke-width="1"/>
+
+<rect class="d-box" x="8" y="52" width="128" height="66" rx="9"/>
+<text class="d-title" x="72" y="80" text-anchor="middle">You order</text>
+<text class="d-sub" x="72" y="98" text-anchor="middle">orderCoffee()</text>
+
+<path class="d-arrow" d="M140 85 L188 85" marker-end="url(#ah-receipt)"/>
+<text class="d-sub" x="164" y="76" text-anchor="middle">0 ms</text>
+
+<rect class="d-box" x="192" y="42" width="140" height="86" rx="9" style="stroke:var(--amber)"/>
+<text class="d-title" x="262" y="70" text-anchor="middle" style="fill:var(--amber)">Buzzer</text>
+<text class="d-sub" x="262" y="88" text-anchor="middle">Promise&lt;Coffee&gt;</text>
+<text class="d-sub" x="262" y="105" text-anchor="middle">state: pending</text>
+<text class="d-sub" x="262" y="119" text-anchor="middle">you have this NOW</text>
+
+<path class="d-arrow" d="M336 85 L392 85" marker-end="url(#ah-receipt)"/>
+<text class="d-sub" x="364" y="76" text-anchor="middle">180 s</text>
+<text class="d-sub" x="364" y="102" text-anchor="middle">await</text>
+
+<rect class="d-box" x="396" y="52" width="128" height="66" rx="9" style="stroke:var(--green)"/>
+<text class="d-title" x="460" y="80" text-anchor="middle" style="fill:var(--green)">Coffee</text>
+<text class="d-sub" x="460" y="98" text-anchor="middle">fulfilled</text>
+
+<path class="d-arrow" d="M336 100 Q 430 168 556 124" style="stroke:var(--red)" marker-end="url(#ah-receipt)"/>
+<rect class="d-box" x="540" y="52" width="112" height="66" rx="9" style="stroke:var(--red)"/>
+<text class="d-title" x="596" y="76" text-anchor="middle" style="fill:var(--red)">Sorry, the</text>
+<text class="d-title" x="596" y="92" text-anchor="middle" style="fill:var(--red)">machine broke</text>
+<text class="d-sub" x="596" y="109" text-anchor="middle">rejected</text>
+</svg></div><figcaption>The order returns instantly. The result arrives later, or fails.</figcaption></figure>
+<p>Three things follow from that, and between them they explain nearly every promise bug:</p>
+<ul>
+<li><strong>The receipt arrives instantly.</strong> Calling an async function never blocks. The next line of your test runs immediately.</li>
+<li><strong>The receipt is a real object.</strong> It has a type, it is truthy, you can store it in a variable and pass it around. It just is not the value.</li>
+<li><strong><code>await</code> is the only thing that swaps it for the value.</strong> Waiting at the counter is a deliberate act. Skip it and you walk out holding a buzzer.</li>
+</ul>
+<h3>22.2 The three states</h3>
+<figure class="fig"><div class="fig-scroll"><svg class="diagram" viewBox="0 0 660 190" role="img" aria-label="Promise state machine: pending moves to fulfilled or rejected, then it is settled and cannot change">
+<defs><marker id="ah-states" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor" style="color:var(--text-3)"/></marker></defs>
+<rect class="d-box" x="16" y="66" width="150" height="60" rx="9" style="stroke:var(--amber)"/>
+<text class="d-title" x="91" y="92" text-anchor="middle" style="fill:var(--amber)">pending</text>
+<text class="d-sub" x="91" y="110" text-anchor="middle">still brewing</text>
+
+<path class="d-arrow" d="M170 84 L246 44" style="stroke:var(--green)" marker-end="url(#ah-states)"/>
+<text class="d-sub" x="205" y="50" text-anchor="middle" style="fill:var(--green)">resolve</text>
+
+<path class="d-arrow" d="M170 108 L246 148" style="stroke:var(--red)" marker-end="url(#ah-states)"/>
+<text class="d-sub" x="205" y="152" text-anchor="middle" style="fill:var(--red)">reject</text>
+
+<rect class="d-box" x="250" y="12" width="170" height="60" rx="9" style="stroke:var(--green)"/>
+<text class="d-title" x="335" y="38" text-anchor="middle" style="fill:var(--green)">fulfilled</text>
+<text class="d-sub" x="335" y="56" text-anchor="middle">await gives you the value</text>
+
+<rect class="d-box" x="250" y="120" width="170" height="60" rx="9" style="stroke:var(--red)"/>
+<text class="d-title" x="335" y="146" text-anchor="middle" style="fill:var(--red)">rejected</text>
+<text class="d-sub" x="335" y="164" text-anchor="middle">await throws</text>
+
+<path class="d-arrow" d="M424 42 L500 74" marker-end="url(#ah-states)"/>
+<path class="d-arrow" d="M424 150 L500 118" marker-end="url(#ah-states)"/>
+<rect class="d-box" x="504" y="66" width="146" height="60" rx="9"/>
+<text class="d-title" x="577" y="90" text-anchor="middle">settled</text>
+<text class="d-sub" x="577" y="108" text-anchor="middle">frozen forever</text>
+</svg></div><figcaption>A promise settles once. After that it never changes, and re-awaiting returns the same result instantly.</figcaption></figure>
+<blockquote class="note tip">
+<p><strong>Why this matters in a test:</strong> a settled promise is cached. Store <code>const check = page.locator('.error').isVisible()</code> and await it three times, and you get the same answer three times, taken at the moment the promise was created. That is not a live check. It is a photograph.</p>
+</blockquote>
+<h3>22.3 Promises in variables</h3>
+<p>This is the cheapest bug to make and the hardest to spot, because nothing throws. The variable holds something. It just holds the wrong thing.</p>
+<div class="codeblock hl"><div class="codebar"><span class="lang">TypeScript</span><button class="copy" type="button">Copy</button></div><pre><code><span class="c1">// BROKEN: the variable holds the receipt</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">pending</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">title</span><span class="p">();</span><span class="w">      </span><span class="c1">// Promise&lt;string&gt;, not string</span>
+<span class="nx">pending</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">&#39;Dashboard&#39;</span><span class="p">;</span><span class="w">           </span><span class="c1">// always false</span>
+<span class="nx">pending</span><span class="p">.</span><span class="nx">toUpperCase</span><span class="p">();</span><span class="w">             </span><span class="c1">// TypeError: not a function</span>
+
+<span class="c1">// CORRECT: the variable holds the value</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">title</span><span class="p">();</span><span class="w">  </span><span class="c1">// string, so the comparison means something</span></code></pre></div>
+<figure class="fig"><div class="fig-scroll"><svg class="diagram" viewBox="0 0 660 200" role="img" aria-label="Without await the variable holds a promise wrapper, with await it holds the value">
+<text class="d-label" x="10" y="18" style="fill:var(--red)">WITHOUT await</text>
+<rect class="d-box" x="10" y="28" width="290" height="62" rx="9" style="stroke:var(--red)"/>
+<text class="d-sub" x="24" y="54">const title =</text>
+<rect x="120" y="38" width="168" height="42" rx="7" fill="var(--amber-dim)" stroke="var(--amber)"/>
+<text class="d-title" x="204" y="56" text-anchor="middle" style="fill:var(--amber);font-size:11px">Promise wrapper</text>
+<text class="d-sub" x="204" y="72" text-anchor="middle">{ state: pending }</text>
+<text class="d-sub" x="24" y="112" style="fill:var(--red)">typeof title === 'object'</text>
+<text class="d-sub" x="24" y="128" style="fill:var(--red)">Boolean(title) === true  (always)</text>
+
+<text class="d-label" x="360" y="18" style="fill:var(--green)">WITH await</text>
+<rect class="d-box" x="360" y="28" width="290" height="62" rx="9" style="stroke:var(--green)"/>
+<text class="d-sub" x="374" y="54">const title =</text>
+<rect x="470" y="38" width="168" height="42" rx="7" fill="var(--green-dim)" stroke="var(--green)"/>
+<text class="d-title" x="554" y="64" text-anchor="middle" style="fill:var(--green);font-size:12px">'Dashboard'</text>
+<text class="d-sub" x="374" y="112" style="fill:var(--green)">typeof title === 'string'</text>
+<text class="d-sub" x="374" y="128" style="fill:var(--green)">comparisons behave normally</text>
+
+<line x1="10" y1="152" x2="650" y2="152" stroke="var(--line)"/>
+<text class="d-title" x="330" y="178" text-anchor="middle" style="fill:var(--amber)">await unwraps the box. Nothing else does.</text>
+</svg></div><figcaption>The unawaited variable is not empty and not undefined. It is a full, valid, useless object.</figcaption></figure>
+<h4>The silent killer: a promise as a condition</h4>
+<p>Every object in JavaScript is truthy, and a pending promise is an object. So this <code>if</code> never evaluates to false, no matter what the page is showing.</p>
+<div class="codeblock hl"><div class="codebar"><span class="lang">TypeScript</span><button class="copy" type="button">Copy</button></div><pre><code><span class="c1">// BROKEN: the branch is always taken</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">page</span><span class="p">.</span><span class="nx">locator</span><span class="p">(</span><span class="s1">&#39;.error&#39;</span><span class="p">).</span><span class="nx">isVisible</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="s1">&#39;Unexpected error banner&#39;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// CORRECT</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">locator</span><span class="p">(</span><span class="s1">&#39;.error&#39;</span><span class="p">).</span><span class="nx">isVisible</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="s1">&#39;Unexpected error banner&#39;</span><span class="p">);</span>
+<span class="p">}</span></code></pre></div>
+<blockquote class="note warn">
+<p><strong>Why this is worse than a crash:</strong> a crash tells you where it is. This produces a test that reports green while checking nothing, or red while checking nothing. It is a false signal in both directions, and it can sit in a suite for a year.</p>
+</blockquote>
+<h4>The photograph problem</h4>
+<p>Because a settled promise is frozen, storing one and reusing it gives you a stale reading. The real world version is checking the departures board once, photographing it, then consulting the photo all afternoon.</p>
+<div class="codeblock hl"><div class="codebar"><span class="lang">TypeScript</span><button class="copy" type="button">Copy</button></div><pre><code><span class="c1">// BROKEN: the answer is taken before the click, not after</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">spinnerVisible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">locator</span><span class="p">(</span><span class="s1">&#39;.spinner&#39;</span><span class="p">).</span><span class="nx">isVisible</span><span class="p">();</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">getByRole</span><span class="p">(</span><span class="s1">&#39;button&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Load&#39;</span><span class="w"> </span><span class="p">}).</span><span class="nx">click</span><span class="p">();</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">spinnerVisible</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* answers the question from BEFORE the click */</span><span class="w"> </span><span class="p">}</span></code></pre></div>
+<blockquote class="note tip">
+<p><strong>The rule:</strong> in a test, await a promise on the line that creates it. A promise parked in a variable for later is almost always a bug. The exception is deliberate parallelism, covered in 22.8.</p>
+</blockquote>
+<h3>22.4 Promises in functions</h3>
+<p>Adding <code>async</code> to a function does one thing: it wraps whatever you return in a promise. You cannot opt out.</p>
+<div class="codeblock hl"><div class="codebar"><span class="lang">TypeScript</span><button class="copy" type="button">Copy</button></div><pre><code><span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">getName</span><span class="p">()</span><span class="o">:</span><span class="w"> </span><span class="nb">Promise</span><span class="o">&lt;</span><span class="kt">string</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="s1">&#39;Nigel&#39;</span><span class="p">;</span><span class="w">                </span><span class="c1">// you return a string</span>
+<span class="p">}</span><span class="w">                                </span><span class="c1">// callers receive Promise&lt;string&gt;</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">getName</span><span class="p">();</span><span class="w">             </span><span class="c1">// Promise&lt;string&gt;</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">getName</span><span class="p">();</span><span class="w">       </span><span class="c1">// string</span></code></pre></div>
+<h4>The floating promise</h4>
+<p>A promise nobody awaits is a floating promise. Real world: you press start on the photocopier and walk straight back to your desk. The copying still happens. You just have no idea when it finishes, and you are not there if it jams.</p>
+<figure class="fig"><div class="fig-scroll"><svg class="diagram" viewBox="0 0 660 230" role="img" aria-label="An awaited call finishes before the assertion starts, a floating call overlaps it">
+<text class="d-label" x="10" y="16" style="fill:var(--green)">AWAITED</text>
+<rect x="10" y="26" width="640" height="72" rx="9" class="d-box"/>
+<rect x="24" y="42" width="180" height="18" rx="5" fill="var(--blue)"/>
+<text class="d-sub" x="114" y="55" text-anchor="middle" style="fill:#fff">await click()</text>
+<rect x="212" y="42" width="150" height="18" rx="5" fill="var(--green)"/>
+<text class="d-sub" x="287" y="55" text-anchor="middle" style="fill:#fff">expect(toast)</text>
+<text class="d-sub" x="24" y="84">click finishes, THEN the assertion starts. Order guaranteed.</text>
+<text class="d-title" x="620" y="60" text-anchor="middle" style="fill:var(--green);font-size:16px">✓</text>
+
+<text class="d-label" x="10" y="126" style="fill:var(--red)">FLOATING (no await)</text>
+<rect x="10" y="136" width="640" height="84" rx="9" class="d-box" style="stroke:var(--red)"/>
+<rect x="24" y="152" width="180" height="18" rx="5" fill="var(--blue)" opacity=".32"/>
+<text class="d-sub" x="114" y="165" text-anchor="middle" style="fill:var(--text-2)">click() still running…</text>
+<rect x="24" y="176" width="150" height="18" rx="5" fill="var(--red)"/>
+<text class="d-sub" x="99" y="189" text-anchor="middle" style="fill:#fff">expect(toast)</text>
+<text class="d-sub" x="184" y="190" style="fill:var(--red)">starts immediately, overlaps the click</text>
+<text class="d-sub" x="24" y="214">Both run at once. Whether it passes depends on which wins the race.</text>
+<text class="d-title" x="620" y="182" text-anchor="middle" style="fill:var(--red);font-size:16px">?</text>
+</svg></div><figcaption>The floating promise does not skip the work. It removes the ordering guarantee.</figcaption></figure>
+<h4>The loop trap</h4>
+<p><code>forEach</code> does not understand async. It calls your callback, gets a promise back, and throws it away. Every iteration starts at once, and the loop reports done before any of them finish.</p>
+<div class="flip"><div class="flip-tabs" role="tablist" aria-label="Ways to loop over async work"><button class="flip-tab" type="button" role="tab" id="tab-loops-0" aria-controls="pane-loops-0" aria-selected="true" tabindex="0">forEach (broken)</button><button class="flip-tab" type="button" role="tab" id="tab-loops-1" aria-controls="pane-loops-1" aria-selected="false" tabindex="-1">for...of (correct)</button><button class="flip-tab" type="button" role="tab" id="tab-loops-2" aria-controls="pane-loops-2" aria-selected="false" tabindex="-1">Promise.all (parallel)</button></div><div class="flip-pane" role="tabpanel" id="pane-loops-0" aria-labelledby="tab-loops-0"><div class="codeblock hl"><div class="codebar"><span class="lang">TypeScript</span><button class="copy" type="button">Copy</button></div><pre><code><span class="nx">patients</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">p</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">api</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">p</span><span class="p">);</span><span class="w">            </span><span class="c1">// forEach throws this promise away</span>
+<span class="p">});</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">(</span><span class="nx">list</span><span class="p">).</span><span class="nx">toHaveCount</span><span class="p">(</span><span class="mf">3</span><span class="p">);</span><span class="w">  </span><span class="c1">// runs before any create finishes</span></code></pre></div></div><div class="flip-pane" role="tabpanel" id="pane-loops-1" aria-labelledby="tab-loops-1" hidden><div class="codeblock hl"><div class="codebar"><span class="lang">TypeScript</span><button class="copy" type="button">Copy</button></div><pre><code><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">p</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">patients</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">api</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">p</span><span class="p">);</span><span class="w">            </span><span class="c1">// each one completes before the next starts</span>
+<span class="p">}</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">(</span><span class="nx">list</span><span class="p">).</span><span class="nx">toHaveCount</span><span class="p">(</span><span class="mf">3</span><span class="p">);</span><span class="w">  </span><span class="c1">// safe</span></code></pre></div></div><div class="flip-pane" role="tabpanel" id="pane-loops-2" aria-labelledby="tab-loops-2" hidden><div class="codeblock hl"><div class="codebar"><span class="lang">TypeScript</span><button class="copy" type="button">Copy</button></div><pre><code><span class="k">await</span><span class="w"> </span><span class="nb">Promise</span><span class="p">.</span><span class="nx">all</span><span class="p">(</span><span class="nx">patients</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">p</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">api</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">p</span><span class="p">)));</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">(</span><span class="nx">list</span><span class="p">).</span><span class="nx">toHaveCount</span><span class="p">(</span><span class="mf">3</span><span class="p">);</span>
+<span class="c1">// Only when the items genuinely do not depend on each other.</span></code></pre></div></div></div>
+<blockquote class="note">
+<p><strong>Memory hook:</strong> <code>forEach</code> is fire and forget. <code>for...of</code> is one at a time. <code>Promise.all</code> is all at once, on purpose, and you waited for them.</p>
+</blockquote>
+<h3>22.5 Promises in classes</h3>
+<p>A constructor must return the object immediately and synchronously. That is a language rule, not a style choice. So a constructor can <em>start</em> async work, but it can never <em>wait</em> for it.</p>
+<p>Real world: the contractor hands you the keys the moment you sign, while the kitchen is still being installed. You have a house object. It is not ready.</p>
+<div class="codeblock hl"><div class="codebar"><span class="lang">TypeScript</span><button class="copy" type="button">Copy</button></div><pre><code><span class="c1">// BROKEN: a race condition baked into the page object</span>
+<span class="kd">class</span><span class="w"> </span><span class="nx">DashboardPage</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">patientCount</span><span class="o">!:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+
+<span class="w">  </span><span class="kr">constructor</span><span class="p">(</span><span class="k">private</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">page</span><span class="o">:</span><span class="w"> </span><span class="kt">Page</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">load</span><span class="p">();</span><span class="w">          </span><span class="c1">// floating: the constructor returns before this finishes</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="k">private</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="nx">load</span><span class="p">()</span><span class="o">:</span><span class="w"> </span><span class="nb">Promise</span><span class="o">&lt;</span><span class="ow">void</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">patientCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">page</span><span class="p">.</span><span class="nx">locator</span><span class="p">(</span><span class="s1">&#39;.row&#39;</span><span class="p">).</span><span class="nx">count</span><span class="p">();</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">dash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">DashboardPage</span><span class="p">(</span><span class="nx">page</span><span class="p">);</span>
+<span class="nx">expect</span><span class="p">(</span><span class="nx">dash</span><span class="p">.</span><span class="nx">patientCount</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="mf">12</span><span class="p">);</span><span class="w">   </span><span class="c1">// undefined... sometimes</span></code></pre></div>
+<figure class="fig"><div class="fig-scroll"><svg class="diagram" viewBox="0 0 660 210" role="img" aria-label="The constructor returns before its async work completes, so the assertion reads an undefined field">
+<text class="d-sub" x="14" y="18" style="fill:var(--text-3)">the assertion lands inside the gap</text>
+<line x1="14" y1="176" x2="646" y2="176" stroke="var(--line)" stroke-width="1.5"/>
+<text class="d-sub" x="14" y="196">t = 0</text>
+<text class="d-sub" x="600" y="196">time →</text>
+
+<rect x="20" y="30" width="120" height="26" rx="6" fill="var(--blue-dim)" stroke="var(--blue)"/>
+<text class="d-sub" x="80" y="47" text-anchor="middle" style="fill:var(--blue)">new Dashboard()</text>
+<line x1="80" y1="56" x2="80" y2="176" stroke="var(--blue)" stroke-dasharray="3 3"/>
+
+<rect x="150" y="70" width="330" height="26" rx="6" fill="var(--amber-dim)" stroke="var(--amber)"/>
+<text class="d-sub" x="315" y="87" text-anchor="middle" style="fill:var(--amber)">this.load() still running… awaiting count()</text>
+<line x1="150" y1="96" x2="150" y2="176" stroke="var(--amber)" stroke-dasharray="3 3"/>
+<line x1="480" y1="96" x2="480" y2="176" stroke="var(--amber)" stroke-dasharray="3 3"/>
+<text class="d-sub" x="480" y="112" text-anchor="middle" style="fill:var(--amber)">field finally set</text>
+
+<rect x="150" y="122" width="150" height="26" rx="6" fill="var(--red-dim)" stroke="var(--red)"/>
+<text class="d-sub" x="225" y="139" text-anchor="middle" style="fill:var(--red)">expect(patientCount)</text>
+<line x1="225" y1="148" x2="225" y2="176" stroke="var(--red)" stroke-dasharray="3 3"/>
+<text class="d-sub" x="225" y="166" text-anchor="middle" style="fill:var(--red)">reads undefined</text>
+</svg></div><figcaption>The constructor hands back an object that is still filling itself in.</figcaption></figure>
+<h4>Three ways out</h4>
+<div class="flip"><div class="flip-tabs" role="tablist" aria-label="Three ways to keep async work out of a constructor"><button class="flip-tab" type="button" role="tab" id="tab-classfix-0" aria-controls="pane-classfix-0" aria-selected="true" tabindex="0">Static factory</button><button class="flip-tab" type="button" role="tab" id="tab-classfix-1" aria-controls="pane-classfix-1" aria-selected="false" tabindex="-1">Lazy getters</button><button class="flip-tab" type="button" role="tab" id="tab-classfix-2" aria-controls="pane-classfix-2" aria-selected="false" tabindex="-1">Fixture (best)</button></div><div class="flip-pane" role="tabpanel" id="pane-classfix-0" aria-labelledby="tab-classfix-0"><div class="codeblock hl"><div class="codebar"><span class="lang">TypeScript</span><button class="copy" type="button">Copy</button></div><pre><code><span class="kd">class</span><span class="w"> </span><span class="nx">DashboardPage</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">private</span><span class="w"> </span><span class="kr">constructor</span><span class="p">(</span>
+<span class="w">    </span><span class="k">private</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">page</span><span class="o">:</span><span class="w"> </span><span class="kt">Page</span><span class="p">,</span>
+<span class="w">    </span><span class="k">readonly</span><span class="w"> </span><span class="nx">patientCount</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">,</span>
+<span class="w">  </span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+
+<span class="w">  </span><span class="k">static</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="nx">open</span><span class="p">(</span><span class="nx">page</span><span class="o">:</span><span class="w"> </span><span class="kt">Page</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="nb">Promise</span><span class="o">&lt;</span><span class="nx">DashboardPage</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="kr">goto</span><span class="p">(</span><span class="s1">&#39;/dashboard&#39;</span><span class="p">);</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">locator</span><span class="p">(</span><span class="s1">&#39;.row&#39;</span><span class="p">).</span><span class="nx">count</span><span class="p">();</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">DashboardPage</span><span class="p">(</span><span class="nx">page</span><span class="p">,</span><span class="w"> </span><span class="nx">count</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">dash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">DashboardPage</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="nx">page</span><span class="p">);</span><span class="w">   </span><span class="c1">// fully built, or not at all</span></code></pre></div><p>The private constructor makes the unsafe path impossible. Nobody can call <code>new</code> by accident, so the compiler enforces the rule instead of a review comment.</p></div><div class="flip-pane" role="tabpanel" id="pane-classfix-1" aria-labelledby="tab-classfix-1" hidden><div class="codeblock hl"><div class="codebar"><span class="lang">TypeScript</span><button class="copy" type="button">Copy</button></div><pre><code><span class="kd">class</span><span class="w"> </span><span class="nx">DashboardPage</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kr">constructor</span><span class="p">(</span><span class="k">private</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">page</span><span class="o">:</span><span class="w"> </span><span class="kt">Page</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span><span class="w">   </span><span class="c1">// stays synchronous</span>
+
+<span class="w">  </span><span class="k">async</span><span class="w"> </span><span class="nx">patientCount</span><span class="p">()</span><span class="o">:</span><span class="w"> </span><span class="nb">Promise</span><span class="o">&lt;</span><span class="kt">number</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">page</span><span class="p">.</span><span class="nx">locator</span><span class="p">(</span><span class="s1">&#39;.row&#39;</span><span class="p">).</span><span class="nx">count</span><span class="p">();</span><span class="w">   </span><span class="c1">// read fresh, every call</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">expect</span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">dash</span><span class="p">.</span><span class="nx">patientCount</span><span class="p">()).</span><span class="nx">toBe</span><span class="p">(</span><span class="mf">12</span><span class="p">);</span></code></pre></div><p>This is the right default for page objects. State read on demand cannot go stale, which is the same reason you store a <code>Locator</code> and never an <code>ElementHandle</code>.</p></div><div class="flip-pane" role="tabpanel" id="pane-classfix-2" aria-labelledby="tab-classfix-2" hidden><div class="codeblock hl"><div class="codebar"><span class="lang">TypeScript</span><button class="copy" type="button">Copy</button></div><pre><code><span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">test</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">base</span><span class="p">.</span><span class="nx">extend</span><span class="o">&lt;</span><span class="p">{</span><span class="w"> </span><span class="nx">dashboard</span><span class="o">:</span><span class="w"> </span><span class="kt">DashboardPage</span><span class="w"> </span><span class="p">}</span><span class="o">&gt;</span><span class="p">({</span>
+<span class="w">  </span><span class="nx">dashboard</span><span class="o">:</span><span class="w"> </span><span class="kt">async</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">page</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="nx">use</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">dash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">DashboardPage</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="nx">page</span><span class="p">);</span>
+<span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">use</span><span class="p">(</span><span class="nx">dash</span><span class="p">);</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="p">});</span>
+
+<span class="nx">test</span><span class="p">(</span><span class="s1">&#39;shows every patient&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">dashboard</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// arrives fully constructed, with no await for anyone to forget</span>
+<span class="p">});</span></code></pre></div><p>A fixture puts the setup somewhere a test author cannot skip it. That is the framework level fix: remove the opportunity for the mistake rather than documenting it.</p></div></div>
+<blockquote class="note warn">
+<p><strong>The class field trap:</strong> <code>private ready = this.init();</code> looks tidy and is the same bug wearing a suit. The field holds a pending promise, and nothing forces anyone to await it.</p>
+</blockquote>
+<h3>22.6 Why this becomes flakiness</h3>
+<p>A missing <code>await</code> does not always fail. Playwright's <code>expect</code> retries for up to five seconds, so if the forgotten action lands inside that window the test passes and nobody notices.</p>
+<p>Then CI runs eight workers on a loaded box, the action takes longer than the retry budget, and the test fails. Nothing changed except the timing. That gap between "usually wins the race" and "sometimes loses it" is exactly what flakiness is.</p>
+<div class="sim" data-sim><div class="sim-head"><h4>Drag the machine speed</h4><span class="sim-hint">same test, same code, both lanes</span></div><div class="sim-row"><input type="range" class="sim-range" min="50" max="900" step="10" value="120" aria-label="How long the click takes, in milliseconds"><span class="sim-val" data-val>120 ms</span></div><div class="sim-presets"><button class="sim-preset on" type="button" data-ms="120">Your laptop</button><button class="sim-preset" type="button" data-ms="380">CI, idle</button><button class="sim-preset" type="button" data-ms="620">CI, 8 workers</button><button class="sim-preset" type="button" data-ms="860">CI, box under load</button></div><div class="lane"><div class="lane-top"><span class="lane-name">await page.click()  →  await expect(toast)</span><span class="verdict pass" data-verdict="1">passed</span></div><div class="track"><div class="bar action" data-bar="1a"></div><div class="bar assert pass" data-bar="1b"></div></div></div><div class="lane"><div class="lane-top"><span class="lane-name">page.click()  →  await expect(toast)   [no await]</span><span class="verdict pass" data-verdict="2">passed</span></div><div class="track"><div class="bar action" data-bar="2a"></div><div class="bar assert pass" data-bar="2b"></div><div class="sim-marker" data-marker><span>retry budget ends</span></div></div></div><div class="sim-legend"><span><i style="background:var(--blue)"></i>click running</span><span><i style="background:var(--green)"></i>assertion, satisfied</span><span><i style="background:var(--red)"></i>assertion, timed out</span></div><p class="sim-verdict ok" data-sim-verdict aria-live="polite"></p></div>
+<p>The awaited lane is unaffected by machine speed, because ordering is guaranteed by the language rather than by luck. The unawaited lane is fine until it is not, and the threshold sits somewhere you will never find on your own laptop.</p>
+<blockquote class="note warn">
+<p><strong>This is why "it passes locally" is not evidence.</strong> Your laptop is the fastest, quietest machine the test will ever run on. It is the environment least likely to expose a race.</p>
+</blockquote>
+<h4>The five patterns, ranked by how often they bite</h4>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>What you see</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Missing <code>await</code> on an action</td>
+<td>Intermittent failure on the <em>next</em> step, not the guilty one</td>
+<td><code>no-floating-promises</code></td>
+</tr>
+<tr>
+<td>Promise used as a condition</td>
+<td>Branch always taken. Test green but checking nothing</td>
+<td><code>no-misused-promises</code></td>
+</tr>
+<tr>
+<td><code>async</code> inside <code>forEach</code></td>
+<td>Counts wrong, data missing, order scrambled</td>
+<td><code>for...of</code>, or <code>Promise.all</code> with <code>map</code></td>
+</tr>
+<tr>
+<td>Async work in a constructor</td>
+<td><code>undefined</code> field, worse under parallel workers</td>
+<td>Static factory, or a fixture</td>
+</tr>
+<tr>
+<td>Unhandled rejection</td>
+<td>A <em>later, unrelated</em> test fails. Debugging goes to the wrong file</td>
+<td>Await it, or handle it explicitly</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote class="note">
+<p><strong>The tell:</strong> when the failing assertion is not the broken one, suspect a floating promise on an earlier line. Promise bugs report themselves one step downstream of the cause, which is why they eat so much debugging time.</p>
+</blockquote>
+<h3>22.7 Diagnosis: is my flaky test a promise problem?</h3>
+<figure class="fig"><div class="fig-scroll"><svg class="diagram" viewBox="0 0 660 400" role="img" aria-label="Flowchart for diagnosing whether a flaky test is caused by a promise bug">
+<defs><marker id="ah-flow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor" style="color:var(--text-3)"/></marker></defs>
+<rect x="220" y="6" width="220" height="40" rx="8" class="d-box" style="stroke:var(--amber)"/>
+<text class="d-title" x="330" y="31" text-anchor="middle" style="fill:var(--amber)">A test fails intermittently</text>
+<path class="d-arrow" d="M330 46 L330 68" marker-end="url(#ah-flow)"/>
+
+<rect x="180" y="70" width="300" height="42" rx="8" class="d-box"/>
+<text class="d-label" x="330" y="88" text-anchor="middle">Does it pass locally and fail in CI,</text>
+<text class="d-label" x="330" y="103" text-anchor="middle">or fail more with more workers?</text>
+
+<path class="d-arrow" d="M180 91 L92 91 L92 128" marker-end="url(#ah-flow)"/>
+<text class="d-sub" x="120" y="85" style="fill:var(--red)">no</text>
+<rect x="12" y="130" width="160" height="44" rx="8" class="d-box"/>
+<text class="d-label" x="92" y="149" text-anchor="middle">Probably environment,</text>
+<text class="d-label" x="92" y="164" text-anchor="middle">data, or a real bug</text>
+
+<path class="d-arrow" d="M330 112 L330 136" marker-end="url(#ah-flow)"/>
+<text class="d-sub" x="340" y="130" style="fill:var(--green)">yes</text>
+
+<rect x="180" y="138" width="300" height="42" rx="8" class="d-box"/>
+<text class="d-label" x="330" y="156" text-anchor="middle">Is the failing line the one that</text>
+<text class="d-label" x="330" y="171" text-anchor="middle">actually does the broken thing?</text>
+
+<path class="d-arrow" d="M330 180 L330 204" marker-end="url(#ah-flow)"/>
+<text class="d-sub" x="340" y="197" style="fill:var(--red)">no, it is downstream</text>
+
+<rect x="150" y="206" width="360" height="44" rx="8" class="d-box" style="stroke:var(--red)"/>
+<text class="d-title" x="330" y="225" text-anchor="middle" style="fill:var(--red)">Strong signal: floating promise upstream</text>
+<text class="d-sub" x="330" y="241" text-anchor="middle">read every line above the failure for a missing await</text>
+
+<path class="d-arrow" d="M330 250 L330 272" marker-end="url(#ah-flow)"/>
+
+<rect x="140" y="274" width="380" height="42" rx="8" class="d-box"/>
+<text class="d-label" x="330" y="292" text-anchor="middle">Run the linter: no-floating-promises,</text>
+<text class="d-label" x="330" y="307" text-anchor="middle">no-misused-promises, await-thenable</text>
+
+<path class="d-arrow" d="M330 316 L330 332 L220 332 L220 344" marker-end="url(#ah-flow)"/>
+<path class="d-arrow" d="M330 316 L330 332 L454 332 L454 344" marker-end="url(#ah-flow)"/>
+
+<rect x="104" y="346" width="232" height="44" rx="8" class="d-box" style="stroke:var(--green)"/>
+<text class="d-title" x="220" y="366" text-anchor="middle" style="fill:var(--green)">Rule fires</text>
+<text class="d-sub" x="220" y="382" text-anchor="middle">that is your bug. Fix and move on.</text>
+
+<rect x="344" y="346" width="220" height="44" rx="8" class="d-box"/>
+<text class="d-title" x="454" y="366" text-anchor="middle">Nothing fires</text>
+<text class="d-sub" x="454" y="382" text-anchor="middle">open the trace, compare timings</text>
+</svg></div><figcaption>Run the linter before you read the trace. It costs thirty seconds and resolves most of these outright.</figcaption></figure>
+<h3>22.8 The fix list</h3>
+<p>The highest value change is the first one. Four rules eliminate most of the category at build time, before anyone runs a test.</p>
+<div class="codeblock hl"><div class="codebar"><span class="lang">JSON</span><button class="copy" type="button">Copy</button></div><pre><code><span class="c1">// eslint.config.js rules</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="c1">// an async call whose promise is never awaited or returned</span>
+<span class="w">  </span><span class="s2">&quot;@typescript-eslint/no-floating-promises&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;error&quot;</span><span class="p">,</span>
+
+<span class="w">  </span><span class="c1">// a promise used as a condition, or passed where a sync function is expected</span>
+<span class="w">  </span><span class="s2">&quot;@typescript-eslint/no-misused-promises&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;error&quot;</span><span class="p">,</span>
+
+<span class="w">  </span><span class="c1">// await on something that is not a promise, usually a typo or a wrong call</span>
+<span class="w">  </span><span class="s2">&quot;@typescript-eslint/await-thenable&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;error&quot;</span><span class="p">,</span>
+
+<span class="w">  </span><span class="c1">// async on a function with no await, often a leftover</span>
+<span class="w">  </span><span class="s2">&quot;@typescript-eslint/require-await&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;warn&quot;</span>
+<span class="p">}</span></code></pre></div>
+<blockquote class="note tip">
+<p><strong>These need type information.</strong> Point your ESLint config at your <code>tsconfig.json</code>, or the rules silently do nothing. Verify by deleting an <code>await</code> on purpose and checking that the lint run fails.</p>
+</blockquote>
+<p>Then the habits that remove the rest:</p>
+<ul>
+<li><strong>Await on the line that creates the promise.</strong> Do not store promises in variables for later unless you are deliberately parallelising.</li>
+<li><strong>Never <code>waitForTimeout</code>.</strong> A fixed sleep is a bet on machine speed. It is the bug and the workaround at the same time.</li>
+<li><strong>Use web first assertions.</strong> <code>await expect(locator).toBeVisible()</code> polls until true. <code>expect(await locator.isVisible())</code> checks once and is a coin flip.</li>
+<li><strong>Store a <code>Locator</code>, never an <code>ElementHandle</code>.</strong> A locator re-resolves on every use. A handle is a photograph of the DOM.</li>
+<li><strong>Keep constructors synchronous.</strong> Async setup belongs in a static factory or a fixture.</li>
+<li><strong><code>for...of</code> in tests, not <code>forEach</code>.</strong> Make <code>Promise.all</code> a deliberate decision you can defend in review.</li>
+<li><strong>Run with <code>--repeat-each=5</code> before merging.</strong> Races that hide at one run per commit surface quickly at five.</li>
+</ul>
+<h4>The one place Promise.all is required</h4>
+<p>Waiting for a network response triggered by a click is the case people get backwards. Await the wait first and you deadlock: the click never happens, so the response never comes.</p>
+<div class="codeblock hl"><div class="codebar"><span class="lang">TypeScript</span><button class="copy" type="button">Copy</button></div><pre><code><span class="c1">// BROKEN: waits forever, the click is never reached</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">waitForResponse</span><span class="p">(</span><span class="s1">&#39;**/api/save&#39;</span><span class="p">);</span>
+<span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">getByRole</span><span class="p">(</span><span class="s1">&#39;button&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Save&#39;</span><span class="w"> </span><span class="p">}).</span><span class="nx">click</span><span class="p">();</span>
+
+<span class="c1">// CORRECT: start listening, then click</span>
+<span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">response</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nb">Promise</span><span class="p">.</span><span class="nx">all</span><span class="p">([</span>
+<span class="w">  </span><span class="nx">page</span><span class="p">.</span><span class="nx">waitForResponse</span><span class="p">(</span><span class="s1">&#39;**/api/save&#39;</span><span class="p">),</span>
+<span class="w">  </span><span class="nx">page</span><span class="p">.</span><span class="nx">getByRole</span><span class="p">(</span><span class="s1">&#39;button&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Save&#39;</span><span class="w"> </span><span class="p">}).</span><span class="nx">click</span><span class="p">(),</span>
+<span class="p">]);</span>
+<span class="nx">expect</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">status</span><span class="p">()).</span><span class="nx">toBe</span><span class="p">(</span><span class="mf">200</span><span class="p">);</span></code></pre></div>
+<p>Both promises are created before either is awaited, so the listener is already in place when the click fires. Memorise this one, because the broken version fails in the most confusing way available: a hang, then a timeout, on a line that looks correct.</p>
+<h3>22.9 The whole section in nine lines</h3>
+<ol>
+<li>A promise is a receipt. Holding it is not holding the value.</li>
+<li><code>await</code> is the only thing that unwraps it.</li>
+<li>A promise is an object, so it is always truthy. Never use one as a condition.</li>
+<li>A settled promise is frozen. Stored promises give stale answers.</li>
+<li><code>async</code> always wraps the return value, whether you want it to or not.</li>
+<li><code>forEach</code> throws your promises away. Use <code>for...of</code>.</li>
+<li>Constructors cannot await. Use a static factory or a fixture.</li>
+<li>A missing <code>await</code> is not a broken test, it is a race, and races are decided by machine speed.</li>
+<li>Four ESLint rules find nearly all of it before a test ever runs.</li>
+</ol>
+<blockquote class="note tip">
+<p><strong>If you take one thing from this section:</strong> when a test fails on a line that looks innocent, read upward. Promise bugs surface one step after the mistake, and that displacement is what makes them expensive.</p>
+</blockquote></div><button class="markdone" type="button" aria-pressed="false"><span class="tick">○</span><span class="markdone-label">Mark as passed</span></button></section>
+
+<section class="spec" id="modern-js"><div class="spec-bar"><span class="spec-file"><span class="dot"></span>23-modern-js.spec.ts</span><span class="pill">pending</span></div><h2>Modern JavaScript essentials you will use daily</h2><div class="prose"><h3>23.1 Template literals</h3>
 <div class="codeblock hl"><div class="codebar"><span class="lang">TypeScript</span><button class="copy" type="button">Copy</button></div><pre><code><span class="kd">const</span><span class="w"> </span><span class="nx">env</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;qa&#39;</span><span class="p">;</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`https://</span><span class="si">${</span><span class="nx">env</span><span class="si">}</span><span class="sb">.example.com/patients?active=true`</span><span class="p">;</span>
 
@@ -1829,7 +2372,7 @@ npx<span class="w"> </span>playwright<span class="w"> </span><span class="nb">te
 <p>Template literal <strong>types</strong> are a bonus:</p>
 <div class="codeblock hl"><div class="codebar"><span class="lang">TypeScript</span><button class="copy" type="button">Copy</button></div><pre><code><span class="kr">type</span><span class="w"> </span><span class="nx">Env</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;dev&#39;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s1">&#39;qa&#39;</span><span class="p">;</span>
 <span class="kr">type</span><span class="w"> </span><span class="nx">BaseUrl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`https://</span><span class="si">${</span><span class="nx">Env</span><span class="si">}</span><span class="sb">.example.com`</span><span class="p">;</span><span class="w">   </span><span class="c1">// &#39;https://dev.example.com&#39; | &#39;https://qa.example.com&#39;</span></code></pre></div>
-<h3>22.2 Destructuring</h3>
+<h3>23.2 Destructuring</h3>
 <div class="codeblock hl"><div class="codebar"><span class="lang">TypeScript</span><button class="copy" type="button">Copy</button></div><pre><code><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">firstName</span><span class="p">,</span><span class="w"> </span><span class="nx">nhsNumber</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">patient</span><span class="p">;</span>
 <span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">firstName</span><span class="o">:</span><span class="w"> </span><span class="kt">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Unknown&#39;</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">patient</span><span class="p">;</span><span class="w">    </span><span class="c1">// rename plus default</span>
 <span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">first</span><span class="p">,</span><span class="w"> </span><span class="nx">second</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">usernames</span><span class="p">;</span>
@@ -1837,7 +2380,7 @@ npx<span class="w"> </span>playwright<span class="w"> </span><span class="nb">te
 
 <span class="c1">// The Playwright fixture pattern is just destructuring</span>
 <span class="nx">test</span><span class="p">(</span><span class="s1">&#39;example&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">page</span><span class="p">,</span><span class="w"> </span><span class="nx">request</span><span class="p">,</span><span class="w"> </span><span class="nx">browserName</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* ... */</span><span class="w"> </span><span class="p">});</span></code></pre></div>
-<h3>22.3 Spread and rest</h3>
+<h3>23.3 Spread and rest</h3>
 <div class="codeblock hl"><div class="codebar"><span class="lang">TypeScript</span><button class="copy" type="button">Copy</button></div><pre><code><span class="kd">const</span><span class="w"> </span><span class="nx">defaults</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">retries</span><span class="o">:</span><span class="w"> </span><span class="kt">2</span><span class="p">,</span><span class="w"> </span><span class="nx">timeout</span><span class="o">:</span><span class="w"> </span><span class="kt">30_000</span><span class="w"> </span><span class="p">};</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="nx">defaults</span><span class="p">,</span><span class="w"> </span><span class="nx">timeout</span><span class="o">:</span><span class="w"> </span><span class="kt">60_000</span><span class="w"> </span><span class="p">};</span><span class="w">   </span><span class="c1">// later keys win</span>
 
@@ -1849,12 +2392,12 @@ npx<span class="w"> </span>playwright<span class="w"> </span><span class="nb">te
 <span class="nx">copy</span><span class="p">.</span><span class="nx">auth</span><span class="p">.</span><span class="nx">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;changed&#39;</span><span class="p">;</span><span class="w">   </span><span class="c1">// this ALSO changes config.auth.username</span>
 
 <span class="kd">const</span><span class="w"> </span><span class="nx">deepCopy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">structuredClone</span><span class="p">(</span><span class="nx">config</span><span class="p">);</span><span class="w">   </span><span class="c1">// Node 17+, real deep copy</span></code></pre></div>
-<h3>22.4 Arrow functions and <code>this</code></h3>
+<h3>23.4 Arrow functions and <code>this</code></h3>
 <div class="codeblock hl"><div class="codebar"><span class="lang">TypeScript</span><button class="copy" type="button">Copy</button></div><pre><code><span class="kd">const</span><span class="w"> </span><span class="nx">isActive</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">p</span><span class="o">:</span><span class="w"> </span><span class="kt">Patient</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">p</span><span class="p">.</span><span class="nx">active</span><span class="p">;</span>
 
 <span class="c1">// Arrow functions inherit &#39;this&#39; from the enclosing scope.</span>
 <span class="c1">// Regular functions do not, which is why callbacks in classes usually use arrows.</span></code></pre></div>
-<h3>22.5 Optional string and array helpers you will reach for</h3>
+<h3>23.5 Optional string and array helpers you will reach for</h3>
 <div class="codeblock hl"><div class="codebar"><span class="lang">TypeScript</span><button class="copy" type="button">Copy</button></div><pre><code><span class="s1">&#39;ORD-123&#39;</span><span class="p">.</span><span class="nx">startsWith</span><span class="p">(</span><span class="s1">&#39;ORD-&#39;</span><span class="p">);</span>
 <span class="s1">&#39;  text &#39;</span><span class="p">.</span><span class="nx">trim</span><span class="p">();</span>
 <span class="s1">&#39;a,b,c&#39;</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">);</span>
@@ -1864,7 +2407,7 @@ npx<span class="w"> </span>playwright<span class="w"> </span><span class="nb">te
 <span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">patient</span><span class="p">);</span>
 <span class="nb">Object</span><span class="p">.</span><span class="nx">entries</span><span class="p">(</span><span class="nx">patient</span><span class="p">).</span><span class="nx">forEach</span><span class="p">(([</span><span class="nx">key</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="p">])</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="p">));</span></code></pre></div></div><button class="markdone" type="button" aria-pressed="false"><span class="tick">○</span><span class="markdone-label">Mark as passed</span></button></section>
 
-<section class="spec" id="tsconfig"><div class="spec-bar"><span class="spec-file"><span class="dot"></span>23-tsconfig.spec.ts</span><span class="pill">pending</span></div><h2>tsconfig.json explained</h2><div class="prose"><p>A solid starting point for a Playwright framework:</p>
+<section class="spec" id="tsconfig"><div class="spec-bar"><span class="spec-file"><span class="dot"></span>24-tsconfig.spec.ts</span><span class="pill">pending</span></div><h2>tsconfig.json explained</h2><div class="prose"><p>A solid starting point for a Playwright framework:</p>
 <div class="codeblock hl"><div class="codebar"><span class="lang">JSON</span><button class="copy" type="button">Copy</button></div><pre><code><span class="p">{</span>
 <span class="w">  </span><span class="s2">&quot;compilerOptions&quot;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="cm">/* Language and environment */</span>
@@ -1947,7 +2490,7 @@ npx<span class="w"> </span>playwright<span class="w"> </span><span class="nb">te
 </table></div>
 <p><strong>Migrating an existing JavaScript suite?</strong> Start with <code>strict: false</code>, add <code>"allowJs": true</code> and <code>"checkJs": false</code>, convert file by file, then flip <code>strict</code> on once the noise is manageable. Do not try to convert everything in one pull request.</p></div><button class="markdone" type="button" aria-pressed="false"><span class="tick">○</span><span class="markdone-label">Mark as passed</span></button></section>
 
-<section class="spec" id="test-data-env"><div class="spec-bar"><span class="spec-file"><span class="dot"></span>24-test-data-env.spec.ts</span><span class="pill">pending</span></div><h2>Typing test data, JSON and environment variables</h2><div class="prose"><h3>24.1 JSON test data</h3>
+<section class="spec" id="test-data-env"><div class="spec-bar"><span class="spec-file"><span class="dot"></span>25-test-data-env.spec.ts</span><span class="pill">pending</span></div><h2>Typing test data, JSON and environment variables</h2><div class="prose"><h3>25.1 JSON test data</h3>
 <div class="codeblock hl"><div class="codebar"><span class="lang">JSON</span><button class="copy" type="button">Copy</button></div><pre><code><span class="c1">// fixtures/patients.json</span>
 <span class="p">[</span>
 <span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="s2">&quot;id&quot;</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;firstName&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;John&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;lastName&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Smith&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;nhsNumber&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;1234567890&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;active&quot;</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">}</span>
@@ -1956,7 +2499,7 @@ npx<span class="w"> </span>playwright<span class="w"> </span><span class="nb">te
 <span class="k">import</span><span class="w"> </span><span class="nx">patientsJson</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;../fixtures/patients.json&#39;</span><span class="p">;</span>
 
 <span class="kd">const</span><span class="w"> </span><span class="nx">patients</span><span class="o">:</span><span class="w"> </span><span class="kt">Patient</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">patientsJson</span><span class="p">;</span><span class="w">   </span><span class="c1">// validated against your interface at compile time</span></code></pre></div>
-<h3>24.2 Environment variables are always <code>string | undefined</code></h3>
+<h3>25.2 Environment variables are always <code>string | undefined</code></h3>
 <div class="codeblock hl"><div class="codebar"><span class="lang">TypeScript</span><button class="copy" type="button">Copy</button></div><pre><code><span class="c1">// process.env.BASE_URL is string | undefined, ALWAYS</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">baseUrl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">BASE_URL</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="s1">&#39;https://qa.example.com&#39;</span><span class="p">;</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">retries</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Number</span><span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">RETRIES</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="mf">2</span><span class="p">);</span>
@@ -1972,7 +2515,7 @@ npx<span class="w"> </span>playwright<span class="w"> </span><span class="nb">te
 <span class="p">}</span>
 
 <span class="kd">const</span><span class="w"> </span><span class="nx">apiToken</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">requireEnv</span><span class="p">(</span><span class="s1">&#39;API_TOKEN&#39;</span><span class="p">);</span></code></pre></div>
-<h3>24.3 Declaring your own env types</h3>
+<h3>25.3 Declaring your own env types</h3>
 <div class="codeblock hl"><div class="codebar"><span class="lang">TypeScript</span><button class="copy" type="button">Copy</button></div><pre><code><span class="c1">// types/env.d.ts</span>
 <span class="kr">declare</span><span class="w"> </span><span class="nb">global</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="nx">namespace</span><span class="w"> </span><span class="nx">NodeJS</span><span class="w"> </span><span class="p">{</span>
@@ -1985,7 +2528,7 @@ npx<span class="w"> </span>playwright<span class="w"> </span><span class="nb">te
 <span class="p">}</span>
 <span class="k">export</span><span class="w"> </span><span class="p">{};</span></code></pre></div>
 <p>Now <code>process.env.ENVIRONMNET</code> (typo) is a compile error, and <code>process.env.ENVIRONMENT</code> autocompletes its allowed values.</p>
-<h3>24.4 A typed config module</h3>
+<h3>25.4 A typed config module</h3>
 <div class="codeblock hl"><div class="codebar"><span class="lang">TypeScript</span><button class="copy" type="button">Copy</button></div><pre><code><span class="c1">// config/test-config.ts</span>
 <span class="k">export</span><span class="w"> </span><span class="kd">interface</span><span class="w"> </span><span class="nx">TestConfig</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="nx">baseUrl</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
@@ -2010,7 +2553,7 @@ npx<span class="w"> </span>playwright<span class="w"> </span><span class="nb">te
 <span class="w">  </span><span class="p">};</span>
 <span class="p">}</span></code></pre></div></div><button class="markdone" type="button" aria-pressed="false"><span class="tick">○</span><span class="markdone-label">Mark as passed</span></button></section>
 
-<section class="spec" id="playwright-patterns"><div class="spec-bar"><span class="spec-file"><span class="dot"></span>25-playwright-patterns.spec.ts</span><span class="pill">pending</span></div><h2>Playwright specific TypeScript patterns</h2><div class="prose"><h3>25.1 The core types you will import</h3>
+<section class="spec" id="playwright-patterns"><div class="spec-bar"><span class="spec-file"><span class="dot"></span>26-playwright-patterns.spec.ts</span><span class="pill">pending</span></div><h2>Playwright specific TypeScript patterns</h2><div class="prose"><h3>26.1 The core types you will import</h3>
 <div class="codeblock hl"><div class="codebar"><span class="lang">TypeScript</span><button class="copy" type="button">Copy</button></div><pre><code><span class="k">import</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="nx">test</span><span class="p">,</span>
 <span class="w">  </span><span class="nx">expect</span><span class="p">,</span>
@@ -2021,7 +2564,7 @@ npx<span class="w"> </span>playwright<span class="w"> </span><span class="nb">te
 <span class="w">  </span><span class="kr">type</span><span class="w"> </span><span class="nx">APIResponse</span><span class="p">,</span>
 <span class="w">  </span><span class="kr">type</span><span class="w"> </span><span class="nx">TestInfo</span><span class="p">,</span><span class="w">         </span><span class="c1">// metadata about the running test</span>
 <span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@playwright/test&#39;</span><span class="p">;</span></code></pre></div>
-<h3>25.2 Typed custom fixtures, the pattern that makes POM clean</h3>
+<h3>26.2 Typed custom fixtures, the pattern that makes POM clean</h3>
 <div class="codeblock hl"><div class="codebar"><span class="lang">TypeScript</span><button class="copy" type="button">Copy</button></div><pre><code><span class="c1">// fixtures/test-fixtures.ts</span>
 <span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">test</span><span class="w"> </span><span class="kr">as</span><span class="w"> </span><span class="nx">base</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@playwright/test&#39;</span><span class="p">;</span>
 <span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">LoginPage</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@pages/login.page&#39;</span><span class="p">;</span>
@@ -2064,7 +2607,7 @@ npx<span class="w"> </span>playwright<span class="w"> </span><span class="nb">te
 <span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">dashboardPage</span><span class="p">.</span><span class="nx">expectWelcome</span><span class="p">(</span><span class="s1">&#39;Nigel&#39;</span><span class="p">);</span>
 <span class="p">});</span></code></pre></div>
 <p>Every fixture is fully typed and autocompletes in the destructured parameter list. New engineers discover the available page objects just by typing <code>{</code>.</p>
-<h3>25.3 Typed data driven tests</h3>
+<h3>26.3 Typed data driven tests</h3>
 <div class="codeblock hl"><div class="codebar"><span class="lang">TypeScript</span><button class="copy" type="button">Copy</button></div><pre><code><span class="kd">interface</span><span class="w"> </span><span class="nx">LoginCase</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="nx">description</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
 <span class="w">  </span><span class="nx">username</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
@@ -2086,7 +2629,7 @@ npx<span class="w"> </span>playwright<span class="w"> </span><span class="nb">te
 <span class="w">  </span><span class="p">});</span>
 <span class="p">}</span></code></pre></div>
 <p>Add a field to <code>LoginCase</code> and the compiler lists every case you have not updated. That is exactly the maintainability property you want when the suite has 400 tests.</p>
-<h3>25.4 Typing <code>page.evaluate</code></h3>
+<h3>26.4 Typing <code>page.evaluate</code></h3>
 <p>Code inside <code>evaluate</code> runs in the browser, not in Node. Types do not automatically cross that boundary.</p>
 <div class="codeblock hl"><div class="codebar"><span class="lang">TypeScript</span><button class="copy" type="button">Copy</button></div><pre><code><span class="c1">// Explicit return type</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">evaluate</span><span class="o">&lt;</span><span class="kt">string</span><span class="o">&gt;</span><span class="p">(()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nb">window</span><span class="p">.</span><span class="nb">document</span><span class="p">.</span><span class="nx">title</span><span class="p">);</span>
@@ -2103,7 +2646,7 @@ npx<span class="w"> </span>playwright<span class="w"> </span><span class="nb">te
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">appVersion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">evaluate</span><span class="p">(()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nb">window</span><span class="p">.</span><span class="nx">appVersion</span><span class="p">);</span></code></pre></div>
-<h3>25.5 Typed API response assertions</h3>
+<h3>26.5 Typed API response assertions</h3>
 <div class="codeblock hl"><div class="codebar"><span class="lang">TypeScript</span><button class="copy" type="button">Copy</button></div><pre><code><span class="kd">interface</span><span class="w"> </span><span class="nx">ErrorResponse</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="nx">code</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
 <span class="w">  </span><span class="nx">message</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
@@ -2121,7 +2664,7 @@ npx<span class="w"> </span>playwright<span class="w"> </span><span class="nb">te
 <span class="w">  </span><span class="nx">expect</span><span class="p">(</span><span class="nx">body</span><span class="p">.</span><span class="nx">code</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="s1">&#39;INVALID_NHS_NUMBER&#39;</span><span class="p">);</span>
 <span class="w">  </span><span class="nx">expect</span><span class="p">(</span><span class="nx">body</span><span class="p">.</span><span class="nx">details</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="p">[]).</span><span class="nx">toContain</span><span class="p">(</span><span class="s1">&#39;nhsNumber must be 10 digits&#39;</span><span class="p">);</span>
 <span class="p">});</span></code></pre></div>
-<h3>25.6 A typed custom matcher</h3>
+<h3>26.6 A typed custom matcher</h3>
 <div class="codeblock hl"><div class="codebar"><span class="lang">TypeScript</span><button class="copy" type="button">Copy</button></div><pre><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">expect</span><span class="w"> </span><span class="kr">as</span><span class="w"> </span><span class="nx">baseExpect</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@playwright/test&#39;</span><span class="p">;</span>
 
 <span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">expect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">baseExpect</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
@@ -2137,7 +2680,7 @@ npx<span class="w"> </span>playwright<span class="w"> </span><span class="nb">te
 <span class="c1">// Usage, fully typed</span>
 <span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">(</span><span class="nx">patient</span><span class="p">.</span><span class="nx">nhsNumber</span><span class="p">).</span><span class="nx">toBeValidNhsNumber</span><span class="p">();</span></code></pre></div></div><button class="markdone" type="button" aria-pressed="false"><span class="tick">○</span><span class="markdone-label">Mark as passed</span></button></section>
 
-<section class="spec" id="compiler-errors"><div class="spec-bar"><span class="spec-file"><span class="dot"></span>26-compiler-errors.spec.ts</span><span class="pill">pending</span></div><h2>Common compiler errors and how to fix them</h2><div class="prose"><div class="table-scroll"><table>
+<section class="spec" id="compiler-errors"><div class="spec-bar"><span class="spec-file"><span class="dot"></span>27-compiler-errors.spec.ts</span><span class="pill">pending</span></div><h2>Common compiler errors and how to fix them</h2><div class="prose"><div class="table-scroll"><table>
 <thead>
 <tr>
 <th>Error</th>
@@ -2200,7 +2743,7 @@ npx<span class="w"> </span>playwright<span class="w"> </span><span class="nb">te
 </table></div>
 <p><strong>Reading a TypeScript error:</strong> read it from the <strong>bottom up</strong>. The last line is usually the actual mismatch. The lines above are the chain of how it got there.</p></div><button class="markdone" type="button" aria-pressed="false"><span class="tick">○</span><span class="markdone-label">Mark as passed</span></button></section>
 
-<section class="spec" id="best-practices"><div class="spec-bar"><span class="spec-file"><span class="dot"></span>27-best-practices.spec.ts</span><span class="pill">pending</span></div><h2>Best practices</h2><div class="prose"><h3>Type safety</h3>
+<section class="spec" id="best-practices"><div class="spec-bar"><span class="spec-file"><span class="dot"></span>28-best-practices.spec.ts</span><span class="pill">pending</span></div><h2>Best practices</h2><div class="prose"><h3>Type safety</h3>
 <ol>
 <li>Turn <code>strict: true</code> on from day one. Retrofitting it into a mature suite is painful.</li>
 <li>Ban <code>any</code>. Use <code>unknown</code> at trust boundaries and narrow it.</li>
@@ -2248,7 +2791,7 @@ playwright.config.ts
 tsconfig.json
 eslint.config.js</code></pre></div></div><button class="markdone" type="button" aria-pressed="false"><span class="tick">○</span><span class="markdone-label">Mark as passed</span></button></section>
 
-<section class="spec" id="pitfalls"><div class="spec-bar"><span class="spec-file"><span class="dot"></span>28-pitfalls.spec.ts</span><span class="pill">pending</span></div><h2>Common pitfalls</h2><div class="prose"><div class="table-scroll"><table>
+<section class="spec" id="pitfalls"><div class="spec-bar"><span class="spec-file"><span class="dot"></span>29-pitfalls.spec.ts</span><span class="pill">pending</span></div><h2>Common pitfalls</h2><div class="prose"><div class="table-scroll"><table>
 <thead>
 <tr>
 <th>Pitfall</th>
@@ -2320,7 +2863,7 @@ eslint.config.js</code></pre></div></div><button class="markdone" type="button" 
 </tbody>
 </table></div></div><button class="markdone" type="button" aria-pressed="false"><span class="tick">○</span><span class="markdone-label">Mark as passed</span></button></section>
 
-<section class="spec" id="exercises"><div class="spec-bar"><span class="spec-file"><span class="dot"></span>29-exercises.spec.ts</span><span class="pill">pending</span></div><h2>Practice exercises</h2><div class="prose"><p>Good starter tasks for a manual tester learning TypeScript. Roughly in order of difficulty.</p>
+<section class="spec" id="exercises"><div class="spec-bar"><span class="spec-file"><span class="dot"></span>30-exercises.spec.ts</span><span class="pill">pending</span></div><h2>Practice exercises</h2><div class="prose"><p>Good starter tasks for a manual tester learning TypeScript. Roughly in order of difficulty.</p>
 <ol>
 <li><strong>Types:</strong> declare a <code>TestEnvironment</code> union of <code>'dev' | 'qa' | 'staging' | 'prod'</code> and a <code>Record</code> mapping each to a base URL. Make an invalid key fail to compile.</li>
 <li><strong>Interfaces:</strong> model a real API response from your product as an interface, including at least one optional field and one nested object.</li>
@@ -2334,7 +2877,7 @@ eslint.config.js</code></pre></div></div><button class="markdone" type="button" 
 <li><strong>Exhaustiveness:</strong> write a <code>switch</code> over an appointment status union with a <code>never</code> default, then add a new status and watch the compiler point at the gap.</li>
 </ol></div><button class="markdone" type="button" aria-pressed="false"><span class="tick">○</span><span class="markdone-label">Mark as passed</span></button></section>
 
-<section class="spec" id="summary"><div class="spec-bar"><span class="spec-file"><span class="dot"></span>30-summary.spec.ts</span><span class="pill">pending</span></div><h2>One page summary</h2><div class="prose"><h3>Syntax cheat card</h3>
+<section class="spec" id="summary"><div class="spec-bar"><span class="spec-file"><span class="dot"></span>31-summary.spec.ts</span><span class="pill">pending</span></div><h2>One page summary</h2><div class="prose"><h3>Syntax cheat card</h3>
 <div class="codeblock hl"><div class="codebar"><span class="lang">TypeScript</span><button class="copy" type="button">Copy</button></div><pre><code><span class="c1">// Types</span>
 <span class="kd">let</span><span class="w"> </span><span class="nx">s</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nx">n</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nx">b</span><span class="o">:</span><span class="w"> </span><span class="kt">boolean</span><span class="p">;</span>
 <span class="kd">let</span><span class="w"> </span><span class="nx">arr</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">[];</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nx">tup</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="kt">number</span><span class="p">,</span><span class="w"> </span><span class="kt">string</span><span class="p">];</span>
@@ -2407,15 +2950,15 @@ eslint.config.js</code></pre></div></div><button class="markdone" type="button" 
 </tr>
 <tr>
 <td>3</td>
-<td>Section 15 and 25: classes, POM, Playwright fixtures. Write a real page object</td>
+<td>Section 15 and 26: classes, POM, Playwright fixtures. Write a real page object</td>
 </tr>
 <tr>
 <td>4</td>
-<td>Sections 16 to 21: generics, assertions, modules, utility types, async</td>
+<td>Sections 16 to 22: generics, assertions, modules, utility types, async and promises</td>
 </tr>
 <tr>
 <td>5</td>
-<td>Sections 22 to 24 and 27: tsconfig, config typing, best practices. Review a teammate's PR</td>
+<td>Sections 23 to 25 and 28: tsconfig, config typing, best practices. Review a teammate's PR</td>
 </tr>
 </tbody>
 </table></div>
@@ -2433,7 +2976,7 @@ eslint.config.js</code></pre></div></div><button class="markdone" type="button" 
     </div>
 
     <footer class="pagefoot">
-      <span>Updated 08 August 2026</span>
+      <span>Updated 09 August 2026</span>
       <span class="sep">|</span>
       <a href="typescript-cheatsheet.md" download>Download the Markdown</a>
       <span class="sep">|</span>
@@ -2554,7 +3097,8 @@ eslint.config.js</code></pre></div></div><button class="markdone" type="button" 
 
   var search = document.getElementById('search');
   var noResults = document.getElementById('noResults');
-  var index = specs.map(function (s) { return s.innerText.toLowerCase(); });
+  /* textContent, not innerText, so collapsed tab panes stay searchable */
+  var index = specs.map(function (s) { return s.textContent.toLowerCase(); });
 
   function runSearch() {
     var q = search.value.trim().toLowerCase();
@@ -2589,13 +3133,7 @@ eslint.config.js</code></pre></div></div><button class="markdone" type="button" 
 
   /* ---------- active section tracking ---------- */
 
-  function markActive() {
-    var offset = 140;
-    var current = 0;
-    for (var i = 0; i < specs.length; i++) {
-      if (specs[i].classList.contains('hidden')) continue;
-      if (specs[i].getBoundingClientRect().top <= offset) current = i;
-    }
+  function highlight(current) {
     items.forEach(function (li, i) { li.classList.toggle('active', i === current); });
 
     var active = items[current];
@@ -2606,7 +3144,16 @@ eslint.config.js</code></pre></div></div><button class="markdone" type="button" 
         list.scrollTo({ top: top - list.clientHeight / 2, behavior: 'smooth' });
       }
     }
+  }
 
+  function markActive() {
+    var offset = 140;
+    var current = 0;
+    for (var i = 0; i < specs.length; i++) {
+      if (specs[i].classList.contains('hidden')) continue;
+      if (specs[i].getBoundingClientRect().top <= offset) current = i;
+    }
+    highlight(current);
     document.getElementById('toTop').classList.toggle('show', window.scrollY > 700);
   }
 
@@ -2651,10 +3198,109 @@ eslint.config.js</code></pre></div></div><button class="markdone" type="button" 
     toggleNav(!sidebar.classList.contains('open'));
   });
   scrim.addEventListener('click', function () { toggleNav(false); });
-  document.querySelectorAll('.speclist a').forEach(function (a) {
+  document.querySelectorAll('.speclist a').forEach(function (a, i) {
     a.addEventListener('click', function () {
+      /* mark it straight away: clicking the last spec, or one already in
+         view, scrolls too little to fire a scroll event */
+      highlight(i);
       if (window.innerWidth <= 860) toggleNav(false);
     });
+  });
+
+  /* ---------- tabbed comparisons ---------- */
+
+  document.querySelectorAll('.flip-tabs').forEach(function (tablist) {
+    var tabs = Array.prototype.slice.call(tablist.querySelectorAll('.flip-tab'));
+    var panes = tabs.map(function (tab) {
+      return document.getElementById(tab.getAttribute('aria-controls'));
+    });
+
+    function select(i, moveFocus) {
+      tabs.forEach(function (tab, j) {
+        var on = i === j;
+        tab.setAttribute('aria-selected', String(on));
+        tab.tabIndex = on ? 0 : -1;
+        if (panes[j]) panes[j].hidden = !on;
+      });
+      if (moveFocus) tabs[i].focus();
+    }
+
+    tabs.forEach(function (tab, i) {
+      tab.addEventListener('click', function () { select(i, false); });
+      tab.addEventListener('keydown', function (e) {
+        if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+        var next = i + (e.key === 'ArrowRight' ? 1 : -1);
+        if (next < 0 || next >= tabs.length) return;
+        e.preventDefault();
+        select(next, true);
+      });
+    });
+  });
+
+  /* ---------- the race simulator ----------
+     Two lanes run the same test. The awaited lane is ordered by the
+     language; the floating lane is ordered by luck. Slide the machine
+     speed and watch only one of them break. */
+
+  var RETRY_BUDGET = 500;   /* scaled stand-in for Playwright's 5s expect timeout */
+  var HEAD_START = 40;      /* how far the unawaited test runs ahead */
+
+  document.querySelectorAll('[data-sim]').forEach(function (sim) {
+    var range = sim.querySelector('.sim-range');
+    var readout = sim.querySelector('[data-val]');
+    var summary = sim.querySelector('[data-sim-verdict]');
+    var marker = sim.querySelector('[data-marker]');
+    var presets = Array.prototype.slice.call(sim.querySelectorAll('.sim-preset'));
+
+    var bars = {};
+    sim.querySelectorAll('[data-bar]').forEach(function (b) { bars[b.dataset.bar] = b; });
+    var verdicts = {};
+    sim.querySelectorAll('[data-verdict]').forEach(function (v) { verdicts[v.dataset.verdict] = v; });
+
+    function place(el, left, width) {
+      el.style.left = left + '%';
+      el.style.width = Math.max(width, 1.5) + '%';
+    }
+
+    function render() {
+      var ms = +range.value;
+      var deadline = HEAD_START + RETRY_BUDGET;
+      var span = Math.max(ms + RETRY_BUDGET, 700);
+      function pct(v) { return v / span * 100; }
+
+      readout.textContent = ms + ' ms';
+
+      /* awaited: the click finishes, then the assertion starts */
+      place(bars['1a'], 0, pct(ms));
+      place(bars['1b'], pct(ms), pct(60));
+
+      /* floating: the assertion starts early and polls until it gives up */
+      var passes = ms <= deadline;
+      place(bars['2a'], 0, pct(ms));
+      place(bars['2b'], pct(HEAD_START), pct(Math.max((passes ? ms : deadline) - HEAD_START, 20)));
+      bars['2b'].className = 'bar assert ' + (passes ? 'pass' : 'fail');
+      verdicts['2'].className = 'verdict ' + (passes ? 'pass' : 'fail');
+      verdicts['2'].textContent = passes ? 'passed' : 'failed';
+      marker.style.left = pct(deadline) + '%';
+      marker.classList.toggle('flip', pct(deadline) > 55);
+
+      summary.className = 'sim-verdict ' + (passes ? 'ok' : 'bad');
+      summary.textContent = passes
+        ? 'Passing by luck. The click finishes at ' + ms + ' ms, inside the '
+          + deadline + ' ms retry budget, so the assertion catches it. '
+          + 'Nothing in the code guarantees that.'
+        : 'Failed. The click finishes at ' + ms + ' ms, past the ' + deadline
+          + ' ms retry budget. Identical code, slower box. '
+          + 'This is the CI only failure.';
+
+      presets.forEach(function (p) { p.classList.toggle('on', +p.dataset.ms === ms); });
+    }
+
+    range.addEventListener('input', render);
+    presets.forEach(function (p) {
+      p.addEventListener('click', function () { range.value = p.dataset.ms; render(); });
+    });
+    render();
   });
 })();
 </script>
