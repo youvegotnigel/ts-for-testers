@@ -24,7 +24,7 @@ No build tooling to install, no dependencies at runtime, no tracking, no paywall
 | **Themes** | Dark and light, with hand tuned syntax colours for both |
 | **Offline** | CSS, JavaScript and syntax highlighting are inlined into `index.html`. The only external request is the IBM Plex web font, which falls back to system fonts with no network |
 
-The page is built around a single idea: it behaves like a test run. Each section is a spec file with a status, the sidebar is runner output, and clearing all 30 prints a completion line like a real runner.
+The page is built around a single idea: it behaves like a test run. Each section is a spec file with a status, the sidebar is runner output, and clearing all 31 prints a completion line like a real runner.
 
 ---
 
@@ -79,6 +79,7 @@ These drive the canonical URL, the social preview metadata, the sitemap, and the
 
 - Each section starts with `## N. Title`, numbered from 1.
 - Section numbers must line up with the `SLUGS` list in `src/build.py`. Adding a section means adding a slug, in the same position, and the counts in the page update themselves from that list.
+- Subheadings inside a section are `### N.M Title`, where `N` is the section they sit in. Inserting a section in the middle means renumbering the `##` headings, the table of contents links, **and** every `### N.M` below it. Nothing enforces this, so it is the easiest thing to get wrong.
 - Fenced code blocks should carry a language: `ts`, `js`, `bash`, `json`, or `jsonc`.
 - Tables use standard Markdown pipe syntax.
 - Callouts use GitHub alert syntax: a blockquote whose first line is `> [!NOTE]`, `> [!TIP]` or `> [!WARNING]`. GitHub renders these natively, and the build tints the note blue, green or red.

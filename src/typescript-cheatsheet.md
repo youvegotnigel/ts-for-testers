@@ -117,7 +117,7 @@ var oldStyle = 'avoid';                        // function scoped, legacy, do no
 
 ```ts
 const users = ['nigel'];
-users.push('ravindu');       // legal, the array contents changed
+users.push('kevin');       // legal, the array contents changed
 // users = ['someone else']; // Error: cannot assign to 'users'
 ```
 
@@ -216,7 +216,7 @@ let env2 = 'qa';     // type is string
 ### 6.1 Arrays
 
 ```ts
-const usernames: string[] = ['nigel', 'ravindu', 'himasha'];
+const usernames: string[] = ['nigel', 'kevin', 'tom'];
 const statusCodes: Array<number> = [200, 404];   // same thing, generic syntax
 const mixed: (string | number)[] = ['ORD-1', 42];
 
@@ -226,7 +226,7 @@ const environments: readonly string[] = ['dev', 'qa', 'prod'];
 // Array of objects, the shape of most test data files
 const users: { username: string; role: string }[] = [
   { username: 'nigel', role: 'admin' },
-  { username: 'ravindu', role: 'clinician' },
+  { username: 'kevin', role: 'clinician' },
 ];
 ```
 
@@ -956,13 +956,13 @@ A generic is a **type parameter**: a placeholder for a type that the caller supp
 function firstAny(items: any[]): any {
   return items[0];
 }
-const name = firstAny(['nigel', 'ravindu']);   // type is any, no autocomplete
+const name = firstAny(['nigel', 'kevin']);   // type is any, no autocomplete
 
 // With generics, the type flows through
 function first<T>(items: T[]): T | undefined {
   return items[0];
 }
-const name2 = first(['nigel', 'ravindu']);     // type is string
+const name2 = first(['nigel', 'kevin']);     // type is string
 const id = first([1, 2, 3]);                   // type is number
 ```
 
